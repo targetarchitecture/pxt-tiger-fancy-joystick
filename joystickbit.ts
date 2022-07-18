@@ -26,16 +26,16 @@ enum key_status {
 
 enum Axis {
     //% block="X"
-    JOYSTICK_X_Axis = 0,
+    JOYSTICK_X_AXIS = 0,
     //% block="Y"
-    JOYSTICK_Y_Axis = 1,
+    JOYSTICK_Y_AXIS = 1,
 }
 
 enum Stick {
     //% block="LEFT"
-    JOYSTICK_left_wi = 0,
+    JOYSTICK_LEFT = 0,
     //% block="RIGHT"
-    JOYSTICK_right_wi = 1,
+    JOYSTICK_RIGHT = 1,
 }
 
 //% color="#FF6EC7" weight=10 icon="\uf2c9" block="Joystick"
@@ -155,10 +155,10 @@ namespace joystick {
         }
     }
 
-    //% blockId=Gamepad_Press block="Is button %button pressed?" 
+    //% blockId=isButtonPressed block="Is button %button pressed?"
     //% weight=74
     //% inlineInputMode=inline
-    export function Gamepad_Press(button: buttons): boolean {
+    export function isButtonPressed(button: buttons): boolean {
         if (Get_Button_Status(button) != NONE_PRESS && Get_Button_Status(button) != 0xff) {
             return true;
         }
@@ -166,10 +166,10 @@ namespace joystick {
     }
 
 
-    //% blockId=Gamepad_Release block="Is button %button released?"
+    //% blockId=isButtonReleased block="Is button %button released?"
     //% weight=74
     //% inlineInputMode=inline
-    export function Gamepad_Release(button: buttons): boolean {
+    export function isButtonReleased(button: buttons): boolean {
         if (Get_Button_Status(button) == NONE_PRESS) {
             return true;
         }
@@ -186,19 +186,19 @@ namespace joystick {
     }
 
 
-    //% blockId=actuator_buzzer1 block="Set buzzer to %freq "  
+    //% blockId=SetBuzzer block="Set buzzer to %freq frequency"
     //% freq.min=0 freq.max=1000
     //% weight=74
-    export function actuator_buzzer1(freq: number): void {
+    export function SetBuzzer(freq: number): void {
         let a = AnalogPin.P0;
         pins.analogWritePin(a, freq)
     }
 
 
-    //% blockId=Gamepad_Wiggly block="Stick %stick axis %axial" 
+    //% blockId=ReadStickAxis block="Stick %stick axis %axial"
     //% weight=74
     //% inlineInputMode=inline
-    export function Gamepad_Wiggly(stick: Stick, axial: Axis) {
+    export function ReadStickAxis(stick: Stick, axial: Axis) {
         let val = 0;
         if (stick == 0) {
             if (axial == 0) {
