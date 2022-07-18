@@ -42,6 +42,48 @@ enum Stick {
 //% category="Joystick"
 namespace joystick {
 
+    let alreadyStarted = false;
+
+    /**
+      * Add into the start function to initialise the joystick.
+      */
+    //% block="Start Joystick"
+    export function start(): void {
+
+        //prevent running more than once
+        if (alreadyStarted == true) {
+            return;
+        } else {
+            alreadyStarted = true;
+        }
+
+        //set-up UART transmission loop
+        control.inBackground(function () {
+            loops.everyInterval(10, function () {
+                BUTTON_LEFT = i2cread(JOYSTICK_I2C_ADDR, BUTTON_LEFT_REG);
+                BUTTON_RIGHT = i2cread(JOYSTICK_I2C_ADDR, BUTTON_RIGHT_REG);
+                JOYSTICK_BUTTON_LEFT = i2cread(JOYSTICK_I2C_ADDR, JOYSTICK_BUTTON_LEFT_REG);
+                JOYSTICK_BUTTON_RIGHT = i2cread(JOYSTICK_I2C_ADDR, JOYSTICK_BUTTON_RIGHT_REG);
+
+                JOYSTICK_LEFT_X = i2cread(JOYSTICK_I2C_ADDR, JOYSTICK_LEFT_X_REG);
+                JOYSTICK_LEFT_Y = i2cread(JOYSTICK_I2C_ADDR, JOYSTICK_LEFT_Y_REG);
+                JOYSTICK_RIGHT_X = i2cread(JOYSTICK_I2C_ADDR, JOYSTICK_RIGHT_X_REG);
+                JOYSTICK_RIGHT_Y = i2cread(JOYSTICK_I2C_ADDR, JOYSTICK_RIGHT_Y_REG);
+            })
+        })
+    }
+
+
+    let JOYSTICK_LEFT_X = 0xff;
+    let JOYSTICK_LEFT_Y = 0xff;
+    let JOYSTICK_RIGHT_X = 0xff;
+    let JOYSTICK_RIGHT_Y = 0xff;
+
+    let BUTTON_LEFT = 0xff;
+    let BUTTON_RIGHT = 0xff;
+    let JOYSTICK_BUTTON_RIGHT = 0xff;
+    let JOYSTICK_BUTTON_LEFT = 0xff;
+
     let i2cAddr: number
     let BK: number
     let RS: number
@@ -134,21 +176,21 @@ namespace joystick {
 
     let BUTTON_LEFT_REG = 0x22;
     let BUTTON_RIGHT_REG = 0x23;
-    let JOYSTICK_BUTTON_RIGHT = 0x21;
-    let JOYSTICK_BUTTON_LEFT = 0x20;
+    let JOYSTICK_BUTTON_RIGHT_REG = 0x21;
+    let JOYSTICK_BUTTON_LEFT_REG = 0x20;
 
     let NONE_PRESS = 8;
 
     function Get_Button_Status(button: number) {
         switch (button) {
             case 0:
-                return i2cread(JOYSTICK_I2C_ADDR, BUTTON_LEFT_REG);
+                return BUTTON_LEFT;
             case 1:
-                return i2cread(JOYSTICK_I2C_ADDR, BUTTON_RIGHT_REG);
+                return BUTTON_RIGHT;
             case 2:
-                return i2cread(JOYSTICK_I2C_ADDR, JOYSTICK_BUTTON_LEFT);
+                return JOYSTICK_BUTTON_LEFT;
             case 3:
-                return i2cread(JOYSTICK_I2C_ADDR, JOYSTICK_BUTTON_RIGHT);
+                return JOYSTICK_BUTTON_RIGHT;
             default:
                 return 0xff;
         }
@@ -164,7 +206,6 @@ namespace joystick {
         }
         return false;
     }
-
 
     //% blockId=isButtonReleased block="Is button %button released?"
     //% weight=74
@@ -192,7 +233,6 @@ namespace joystick {
         pins.analogWritePin(a, shock)
     }
 
-
     //% blockId=SetBuzzer block="Set buzzer to %freq frequency"
     //% freq.min=0 freq.max=1000
     //% weight=74
@@ -209,15 +249,15 @@ namespace joystick {
         let val = 0;
         if (stick == 0) {
             if (axial == 0) {
-                val = i2cread(JOYSTICK_I2C_ADDR, JOYSTICK_LEFT_X_REG);
+                val =  JOYSTICK_LEFT_X;
             } else {
-                val = i2cread(JOYSTICK_I2C_ADDR, JOYSTICK_LEFT_Y_REG);
+                val =  JOYSTICK_LEFT_Y;
             }
         } else {
             if (axial == 0) {
-                val = i2cread(JOYSTICK_I2C_ADDR, JOYSTICK_RIGHT_X_REG);
+                val =  JOYSTICK_RIGHT_X;
             } else {
-                val = i2cread(JOYSTICK_I2C_ADDR, JOYSTICK_RIGHT_Y_REG);
+                val =  JOYSTICK_RIGHT_Y;
             }
         }
         return val;
