@@ -1,41 +1,41 @@
 enum buttons {
-    //% block="LEFT"
-    JOYSTICK_BUTTON_LEFT_L = 0,
-    //% block="RIGHT" 
-    JOYSTICK_BUTTON_RIGHT_R = 1,
+    //% block="THUMBSTICK LEFT"
+    THUMBSTICK_LEFT = 0,
+    //% block="THUMBSTICK RIGHT" 
+    THUMBSTICK_RIGHT = 1,
     //% block="LEFTA"
-    JOYSTICK_BUTTON_LEFT = 2,
+    BUTTON_LEFT = 2,
     //% block="RIGHTA" 
-    JOYSTICK_BUTTON_RIGHT = 3,
+    BUTTON_RIGHT = 3,
 }
 
 enum key_status {
     //% block="DOWN"
-    JOYSTICK_PRESS_DOWN = 0,   //press
+    PRESS_DOWN = 0,   //press
     //% block="UP"
-    JOYSTICK_PRESS_UP = 1,    //release
-    // //% block="CLICK1"
-    // SINGLE_CLICK = 3,     //click
-    // //% block="CLICK2"
-    // DOUBLE_CLICK = 4,    //double click
-    // //% block="HOLD"
-    // LONG_PRESS_HOLD = 6,    //long pressed
-    // //% block="PRESS"
-    // NONE_PRESS = 8,      //not pressed
+    PRESS_UP = 1,    //release
+    //% block="CLICK1"
+    SINGLE_CLICK = 3,     //click
+    //% block="CLICK2"
+    DOUBLE_CLICK = 4,    //double click
+    //% block="HOLD"
+    LONG_PRESS_HOLD = 6,    //long pressed
+    //% block="PRESS"
+    NONE_PRESS = 8,      //not pressed
 }
 
 enum Axis {
     //% block="X"
-    JOYSTICK_X_AXIS = 0,
+    X_AXIS = 0,
     //% block="Y"
-    JOYSTICK_Y_AXIS = 1,
+    Y_AXIS = 1,
 }
 
 enum Stick {
     //% block="LEFT"
-    JOYSTICK_LEFT = 0,
+    LEFT = 0,
     //% block="RIGHT"
-    JOYSTICK_RIGHT = 1,
+    RIGHT = 1,
 }
 
 //% color="#FF6EC7" weight=10 icon="\uf2c9" block="Joystick"
@@ -105,7 +105,6 @@ namespace joystick {
 
     function stringToBytes(str: string) {
 
-
         let ch = 0;
         let st = 0;
         let gm: number[];
@@ -159,7 +158,8 @@ namespace joystick {
     //% weight=74
     //% inlineInputMode=inline
     export function isButtonPressed(button: buttons): boolean {
-        if (Get_Button_Status(button) != NONE_PRESS && Get_Button_Status(button) != 0xff) {
+        let buttonStatus = Get_Button_Status(button);
+        if (buttonStatus != NONE_PRESS && buttonStatus != 0xff) {
             return true;
         }
         return false;
@@ -174,6 +174,13 @@ namespace joystick {
             return true;
         }
         return false;
+    }
+
+    //% blockId=buttonStatus block="Get button %button status"
+    //% weight=74
+    //% inlineInputMode=inline
+    export function buttonStatus(button: buttons): key_status {
+        return Get_Button_Status(button)
     }
 
     //% blockId=Gamepad_shock block="Set vibration to %shock"  
