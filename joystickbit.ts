@@ -3,9 +3,9 @@ enum buttons {
     THUMBSTICK_LEFT = 0,
     //% block="THUMBSTICK RIGHT" 
     THUMBSTICK_RIGHT = 1,
-    //% block="LEFTA"
+    //% block="LEFT"
     BUTTON_LEFT = 2,
-    //% block="RIGHTA" 
+    //% block="RIGHT" 
     BUTTON_RIGHT = 3,
 }
 
@@ -43,6 +43,21 @@ enum Stick {
 namespace joystick {
 
     let alreadyStarted = false;
+    const SWITCH_PRESSED = 5010;
+    const THUMBSTICK_LEFT_MOVED = 6010;
+    const THUMBSTICK_RIGHT_MOVED = 7010;
+    const pinOffset = 1000;
+    const centered = 128;
+    
+    let PREV_THUMBSTICK_LEFT = -1
+    let PREV_THUMBSTICK_RIGHT = -1
+    let PREV_BUTTON_LEFT = -1
+    let PREV_BUTTON_RIGHT = -1
+
+    let PREV_THUMBSTICK_LEFT_X = centered;
+    let PREV_THUMBSTICK_LEFT_Y = centered;
+    let PREV_THUMBSTICK_RIGHT_X = centered;
+    let PREV_THUMBSTICK_RIGHT_Y = centered;
 
     /**
       * Add into the start function to initialise the joystick.
@@ -57,32 +72,123 @@ namespace joystick {
             alreadyStarted = true;
         }
 
-        //set-up UART transmission loop
+        //set-up I2C fetch loop
         control.inBackground(function () {
             loops.everyInterval(10, function () {
-                BUTTON_LEFT = i2cread(JOYSTICK_I2C_ADDR, BUTTON_LEFT_REG);
-                BUTTON_RIGHT = i2cread(JOYSTICK_I2C_ADDR, BUTTON_RIGHT_REG);
-                JOYSTICK_BUTTON_LEFT = i2cread(JOYSTICK_I2C_ADDR, JOYSTICK_BUTTON_LEFT_REG);
-                JOYSTICK_BUTTON_RIGHT = i2cread(JOYSTICK_I2C_ADDR, JOYSTICK_BUTTON_RIGHT_REG);
 
-                JOYSTICK_LEFT_X = i2cread(JOYSTICK_I2C_ADDR, JOYSTICK_LEFT_X_REG);
-                JOYSTICK_LEFT_Y = i2cread(JOYSTICK_I2C_ADDR, JOYSTICK_LEFT_Y_REG);
-                JOYSTICK_RIGHT_X = i2cread(JOYSTICK_I2C_ADDR, JOYSTICK_RIGHT_X_REG);
-                JOYSTICK_RIGHT_Y = i2cread(JOYSTICK_I2C_ADDR, JOYSTICK_RIGHT_Y_REG);
+                BUTTON_LEFT = i2cread(THUMBSTICK_I2C_ADDR, BUTTON_LEFT_REG);
+                BUTTON_RIGHT = i2cread(THUMBSTICK_I2C_ADDR, BUTTON_RIGHT_REG);
+                THUMBSTICK_BUTTON_LEFT = i2cread(THUMBSTICK_I2C_ADDR, THUMBSTICK_BUTTON_LEFT_REG);
+                THUMBSTICK_BUTTON_RIGHT = i2cread(THUMBSTICK_I2C_ADDR, THUMBSTICK_BUTTON_RIGHT_REG);
+
+                //check for button clicks
+                if (PREV_THUMBSTICK_LEFT == 0 && THUMBSTICK_BUTTON_LEFT == 1) {
+                    control.raiseEvent(SWITCH_PRESSED + buttons.THUMBSTICK_LEFT, buttons.THUMBSTICK_LEFT + pinOffset)
+                }
+                PREV_THUMBSTICK_LEFT = THUMBSTICK_BUTTON_LEFT
+
+                if (PREV_BUTTON_LEFT == 0 && BUTTON_LEFT == 1) {
+                    control.raiseEvent(SWITCH_PRESSED + buttons.BUTTON_LEFT, buttons.BUTTON_LEFT + pinOffset)
+                }
+                PREV_BUTTON_LEFT = BUTTON_LEFT
+
+                if (PREV_THUMBSTICK_RIGHT == 0 && THUMBSTICK_BUTTON_RIGHT == 1) {
+                    control.raiseEvent(SWITCH_PRESSED + buttons.THUMBSTICK_RIGHT, buttons.THUMBSTICK_RIGHT + pinOffset)
+                }
+                PREV_THUMBSTICK_RIGHT = THUMBSTICK_BUTTON_RIGHT
+
+                if (PREV_BUTTON_RIGHT == 0 && BUTTON_RIGHT == 1) {
+                    control.raiseEvent(SWITCH_PRESSED + buttons.BUTTON_RIGHT, buttons.BUTTON_RIGHT + pinOffset)
+                }
+                PREV_BUTTON_RIGHT = BUTTON_RIGHT               
+
+               //thumbsticks
+                THUMBSTICK_LEFT_X = i2cread(THUMBSTICK_I2C_ADDR, THUMBSTICK_LEFT_X_REG);
+                THUMBSTICK_LEFT_Y = i2cread(THUMBSTICK_I2C_ADDR, THUMBSTICK_LEFT_Y_REG);
+                THUMBSTICK_RIGHT_X = i2cread(THUMBSTICK_I2C_ADDR, THUMBSTICK_RIGHT_X_REG);
+                THUMBSTICK_RIGHT_Y = i2cread(THUMBSTICK_I2C_ADDR, THUMBSTICK_RIGHT_Y_REG);
+
+                if (PREV_THUMBSTICK_LEFT_X != THUMBSTICK_LEFT_X || PREV_THUMBSTICK_LEFT_Y != THUMBSTICK_LEFT_Y) {
+                    control.raiseEvent(THUMBSTICK_LEFT_MOVED, THUMBSTICK_LEFT_X + THUMBSTICK_LEFT_Y);
+                }
+
+                if (PREV_THUMBSTICK_RIGHT_X != THUMBSTICK_RIGHT_X || PREV_THUMBSTICK_RIGHT_Y != THUMBSTICK_RIGHT_Y) {
+                    control.raiseEvent(THUMBSTICK_RIGHT_MOVED, THUMBSTICK_RIGHT_X + THUMBSTICK_RIGHT_Y);
+                }
+
+                PREV_THUMBSTICK_LEFT_X = THUMBSTICK_LEFT_X;
+                PREV_THUMBSTICK_LEFT_Y = THUMBSTICK_LEFT_Y;
+                PREV_THUMBSTICK_RIGHT_X = THUMBSTICK_RIGHT_X;
+                PREV_THUMBSTICK_RIGHT_Y = THUMBSTICK_RIGHT_Y;
             })
         })
     }
 
+    /**
+     * Do something when a button is pushed.
+     * @param button the button to be checked
+     * @param handler body code to run when the event is raised
+     */
+    //% block="on button pressed %button"
+    //% weight=65
+    export function onButtonPressed(
+        button: buttons,
+        handler: () => void
+    ) {
+        control.onEvent(
+            SWITCH_PRESSED + button,
+            EventBusValue.MICROBIT_EVT_ANY,
+            () => {
+                handler();
+            }
+        );
+    }
 
-    let JOYSTICK_LEFT_X = 0xff;
-    let JOYSTICK_LEFT_Y = 0xff;
-    let JOYSTICK_RIGHT_X = 0xff;
-    let JOYSTICK_RIGHT_Y = 0xff;
+    /**
+ * Do something when left thumbstick is moved.
+ * @param handler body code to run when the event is raised
+ */
+    //% block="on left thumbstick moved"
+    //% weight=65
+    export function onLeftThumbstickMoved(
+        handler: () => void
+    ) {
+        control.onEvent(
+            THUMBSTICK_LEFT_MOVED,
+            EventBusValue.MICROBIT_EVT_ANY,
+            () => {
+                handler();
+            }
+        );
+    }
+
+    /**
+* Do something when right thumbstick is moved.
+* @param handler body code to run when the event is raised
+*/
+    //% block="on right thumbstick moved"
+    //% weight=65
+    export function onRightThumbstickMoved(
+        handler: () => void
+    ) {
+        control.onEvent(
+            THUMBSTICK_RIGHT_MOVED,
+            EventBusValue.MICROBIT_EVT_ANY,
+            () => {
+                handler();
+            }
+        );
+    }
+
+    let THUMBSTICK_LEFT_X = 0xff;
+    let THUMBSTICK_LEFT_Y = 0xff;
+    let THUMBSTICK_RIGHT_X = 0xff;
+    let THUMBSTICK_RIGHT_Y = 0xff;
 
     let BUTTON_LEFT = 0xff;
     let BUTTON_RIGHT = 0xff;
-    let JOYSTICK_BUTTON_RIGHT = 0xff;
-    let JOYSTICK_BUTTON_LEFT = 0xff;
+    let THUMBSTICK_BUTTON_RIGHT = 0xff;
+    let THUMBSTICK_BUTTON_LEFT = 0xff;
 
     let i2cAddr: number
     let BK: number
@@ -167,17 +273,17 @@ namespace joystick {
         return gm;
     }
 
-    let JOYSTICK_I2C_ADDR = 0x5A;
+    let THUMBSTICK_I2C_ADDR = 0x5A;
 
-    let JOYSTICK_LEFT_X_REG = 0x10;
-    let JOYSTICK_LEFT_Y_REG = 0x11;
-    let JOYSTICK_RIGHT_X_REG = 0x12;
-    let JOYSTICK_RIGHT_Y_REG = 0x13;
+    let THUMBSTICK_LEFT_X_REG = 0x10;
+    let THUMBSTICK_LEFT_Y_REG = 0x11;
+    let THUMBSTICK_RIGHT_X_REG = 0x12;
+    let THUMBSTICK_RIGHT_Y_REG = 0x13;
 
     let BUTTON_LEFT_REG = 0x22;
     let BUTTON_RIGHT_REG = 0x23;
-    let JOYSTICK_BUTTON_RIGHT_REG = 0x21;
-    let JOYSTICK_BUTTON_LEFT_REG = 0x20;
+    let THUMBSTICK_BUTTON_RIGHT_REG = 0x21;
+    let THUMBSTICK_BUTTON_LEFT_REG = 0x20;
 
     let NONE_PRESS = 8;
 
@@ -188,9 +294,9 @@ namespace joystick {
             case 1:
                 return BUTTON_RIGHT;
             case 2:
-                return JOYSTICK_BUTTON_LEFT;
+                return THUMBSTICK_BUTTON_LEFT;
             case 3:
-                return JOYSTICK_BUTTON_RIGHT;
+                return THUMBSTICK_BUTTON_RIGHT;
             default:
                 return 0xff;
         }
@@ -249,15 +355,15 @@ namespace joystick {
         let val = 0;
         if (stick == 0) {
             if (axial == 0) {
-                val =  JOYSTICK_LEFT_X;
+                val =  THUMBSTICK_LEFT_X;
             } else {
-                val =  JOYSTICK_LEFT_Y;
+                val =  THUMBSTICK_LEFT_Y;
             }
         } else {
             if (axial == 0) {
-                val =  JOYSTICK_RIGHT_X;
+                val =  THUMBSTICK_RIGHT_X;
             } else {
-                val =  JOYSTICK_RIGHT_Y;
+                val =  THUMBSTICK_RIGHT_Y;
             }
         }
         return val;
