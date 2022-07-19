@@ -59,7 +59,7 @@ enum Stick {
     RIGHT = 1,
 }
 
-//% color="#FF6EC7" weight=10 icon="\uf11b" block="Joystick"
+//% color="#FF6EC7" weight=10 icon="\uf11b" block="Tiger Fancy Joystick"
 //% category="Joystick"
 namespace joystick {
 
@@ -83,7 +83,7 @@ namespace joystick {
     /**
       * Add into the start function to initialise the joystick.
     */
-    //% weight=1
+    //% weight=100
     //% block="Start Joystick"
     export function start(): void {
 
@@ -152,7 +152,7 @@ namespace joystick {
      * @param handler body code to run when the event is raised
      */
     //% block="on button pressed %button"
-    //% weight=10
+    //% weight=90
     export function onButtonPressed(
         button: buttons,
         handler: () => void
@@ -171,7 +171,7 @@ namespace joystick {
  * @param handler body code to run when the event is raised
  */
     //% block="on left thumbstick moved"
-    //% weight=20
+    //% weight=80
     export function onLeftThumbstickMoved(
         handler: () => void
     ) {
@@ -189,7 +189,7 @@ namespace joystick {
 * @param handler body code to run when the event is raised
 */
     //% block="on right thumbstick moved"
-    //% weight=30
+    //% weight=70
     export function onRightThumbstickMoved(
         handler: () => void
     ) {
@@ -325,7 +325,7 @@ namespace joystick {
     // }
 
     //% blockId=isButtonPressed block="Is button %button pressed?"
-    //% weight=74
+    //% weight=0
     //% inlineInputMode=inline
      function isButtonPressed(button: buttons): boolean {
          if (getButtonStatus(button) != NONE_PRESS && getButtonStatus(button) != 0xff) {
@@ -335,7 +335,7 @@ namespace joystick {
     }
 
     //% blockId=isButtonReleased block="Is button %button released?"
-    //% weight=74
+    //% weight=0
     //% inlineInputMode=inline
      function isButtonReleased(button: buttons): boolean {
          if (getButtonStatus(button) == NONE_PRESS) {
@@ -344,8 +344,8 @@ namespace joystick {
         return false;
     }
 
-    //% blockId=buttonStatus block="Get button %button status"
-    //% weight=60
+    //% blockId=buttonStatus block="Read %button button status"
+    //% weight=45
     //% inlineInputMode=inline
     export function getButtonStatus(button: buttons): key_status {
         //return Get_Button_Status(button)
@@ -365,7 +365,7 @@ namespace joystick {
 
     //% blockId=Gamepad_shock block="Set vibration to %shock"  
     //% shock.min=0 shock.max=1000
-    //% weight=40
+    //% weight=46
     //% inlineInputMode=inline
     export function setVibration(shock: number): void {
         let a = AnalogPin.P1;
@@ -374,15 +374,14 @@ namespace joystick {
 
     //% blockId=SetBuzzer block="Set buzzer to %freq frequency"
     //% freq.min=0 freq.max=1000
-    //% weight=50
+    //% weight=47
     export function setBuzzer(freq: number): void {
         let a = AnalogPin.P0;
         pins.analogWritePin(a, freq)
     }
 
-
-    //% blockId=GetStickAxis block="Stick %stick axis %axial"
-    //% weight=70
+    //% blockId=GetStickAxis block="Read %stick thumbstick axis %axial value"
+    //% weight=10
     //% inlineInputMode=inline
     export function getThumbstickAxis(stick: Stick, axial: Axis) {
         let val = 0;
@@ -402,11 +401,9 @@ namespace joystick {
         return val;
     }
 
-
-
     //https://blackdoor.github.io/blog/thumbstick-controls/
-    //% blockId=getDirection block="Get compass based direction for %stick"
-    //% weight=80
+    //% blockId=getDirection block="Read compass based direction for %stick thumbstick"
+    //% weight=5
     //% inlineInputMode=inline
     export function getDirection(stick: Stick): direction {
 
