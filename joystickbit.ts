@@ -59,7 +59,7 @@ enum Stick {
     RIGHT = 1,
 }
 
-//% color="#FF6EC7" weight=10 icon="\uf2c9" block="Joystick"
+//% color="#FF6EC7" weight=10 icon="\uf11b" block="Joystick"
 //% category="Joystick"
 namespace joystick {
 
@@ -326,7 +326,7 @@ namespace joystick {
     //% blockId=isButtonPressed block="Is button %button pressed?"
     //% weight=74
     //% inlineInputMode=inline
-    export function isButtonPressed(button: buttons): boolean {
+     function isButtonPressed(button: buttons): boolean {
         if (buttonStatus(button) != NONE_PRESS && buttonStatus(button) != 0xff) {
             return true;
         }
@@ -336,7 +336,7 @@ namespace joystick {
     //% blockId=isButtonReleased block="Is button %button released?"
     //% weight=74
     //% inlineInputMode=inline
-    export function isButtonReleased(button: buttons): boolean {
+     function isButtonReleased(button: buttons): boolean {
         if (buttonStatus(button) == NONE_PRESS) {
             return true;
         }
@@ -366,7 +366,7 @@ namespace joystick {
     //% shock.min=0 shock.max=1000
     //% weight=74
     //% inlineInputMode=inline
-    export function SetVibration(shock: number): void {
+    export function setVibration(shock: number): void {
         let a = AnalogPin.P1;
         pins.analogWritePin(a, shock)
     }
@@ -374,7 +374,7 @@ namespace joystick {
     //% blockId=SetBuzzer block="Set buzzer to %freq frequency"
     //% freq.min=0 freq.max=1000
     //% weight=74
-    export function SetBuzzer(freq: number): void {
+    export function setBuzzer(freq: number): void {
         let a = AnalogPin.P0;
         pins.analogWritePin(a, freq)
     }
@@ -383,7 +383,7 @@ namespace joystick {
     //% blockId=GetStickAxis block="Stick %stick axis %axial"
     //% weight=74
     //% inlineInputMode=inline
-    export function GetThumbstickAxis(stick: Stick, axial: Axis) {
+    export function getThumbstickAxis(stick: Stick, axial: Axis) {
         let val = 0;
         if (stick == 0) {
             if (axial == 0) {
