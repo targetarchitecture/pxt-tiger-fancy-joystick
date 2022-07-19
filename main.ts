@@ -15,6 +15,34 @@ joystick.onLeftThumbstickMoved(function () {
     sendRadioMessage(left_x + ":" + left_y)
     led.toggle(2, 2)
 
+    let X = Math.trunc(Math.map(left_x, 0, 255, 0, 4));
+    let Y = Math.trunc(Math.map(left_y, 0, 255, 0, 4));
+
+    // serial.writeValue("X",  joystick.convertXYtoDirection(left_x,left_y));
+    serial.writeValue("X", X);
+    serial.writeValue("Y", Y);
+
+    let dir = 0;
+
+    if (X == 2 && Y == 4) {
+        //North
+    } else if (X == 3 && Y == 3) {
+        //North East
+    } else if (X == 4 && Y == 2) {
+        //East
+    } else if (X == 3 && Y == 1) {
+        //South East
+    } else if (X == 2 && Y == 0) {
+        //South 
+    } else if (X == 0 && Y == 0) {
+        //South West
+    } else if (X == 0 && Y == 2) {
+        // West
+    } else if (X == 0 && Y == 3) {
+        //North West
+    }
+
+
     //serial.writeValue("left_x", left_x)
     //serial.writeValue("left_y", left_y)
 })
@@ -41,12 +69,15 @@ function sendRadioMessage(message: string) {
     radio.sendString(message)
     lastCommandSend = control.millis()
 }
+
 joystick.onButtonPressed(buttons.BUTTON_LEFT, function () {
     led.toggle(0, 2)
 })
+
 joystick.onButtonPressed(buttons.BUTTON_RIGHT, function () {
     led.toggle(4, 2)
 })
+
 joystick.onButtonPressed(buttons.THUMBSTICK_RIGHT, function () {
     led.toggle(4, 2)
 })

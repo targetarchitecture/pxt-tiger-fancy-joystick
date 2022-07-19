@@ -368,4 +368,46 @@ namespace joystick {
         }
         return val;
     }
+
+// //https://blackdoor.github.io/blog/thumbstick-controls/
+//     export  function getAngleFromXY(XAxisValue: number, YAxisValue: number) : number
+//     {
+//         //Normally Atan2 takes Y,X, not X,Y.  We switch these around since we want 0
+//         // degrees to be straight up, not to the right like the unit circle;
+//       let  angleInRadians = Math.atan2(XAxisValue, YAxisValue);
+
+//         //Atan2 gives us a negative value for angles in the 3rd and 4th quadrants.
+//         // We want a full 360 degrees, so we will add 2 PI to negative values.
+//         if (angleInRadians < 0.0) {angleInRadians += (Math.PI * 2.0)};
+
+//         //Convert the radians to degrees.  Degrees are easier to visualize.
+//         let angleInDegrees = (180.0 * angleInRadians / Math.PI);
+
+//         return angleInDegrees;
+//     }
+
+//  export   function convertXYtoDirection(X: number ,Y: number) : number
+//     {
+//         //We have 8 sectors, so get the size of each in degrees.
+//         let sectorSize = 360.0 / 8;
+
+//         //We also need the size of half a sector
+//         let halfSectorSize = sectorSize / 2.0;
+
+//         //First, get the angle using the function above
+//         let thumbstickAngle = getAngleFromXY(X, Y);
+
+//         //Next, rotate our angle to match the offset of our sectors.
+//         let convertedAngle = thumbstickAngle + halfSectorSize;
+
+//         //Finally, we get the current direction by dividing the angle
+//         // by the size of the sectors
+//         let direction =  Math.floor(convertedAngle / sectorSize);
+
+//         //the result directions map as follows:
+//         // 0 = UP, 1 = UP-RIGHT, 2 = RIGHT ... 7 = UP-LEFT.
+//         return direction;
+//     }
+
+
 }
