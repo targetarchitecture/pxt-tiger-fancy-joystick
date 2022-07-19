@@ -19,29 +19,31 @@ joystick.onLeftThumbstickMoved(function () {
     let Y = Math.trunc(Math.map(left_y, 0, 255, 0, 4));
 
     // serial.writeValue("X",  joystick.convertXYtoDirection(left_x,left_y));
-    serial.writeValue("X", X);
-    serial.writeValue("Y", Y);
+    //serial.writeValue("X", X);
+    //serial.writeValue("Y", Y);
 
-    let dir = 0;
+    let dir = "NONE";
 
     if (X == 2 && Y == 4) {
         //North
+        dir = "North";
     } else if (X == 3 && Y == 3) {
-        //North East
+        dir = "North East";
     } else if (X == 4 && Y == 2) {
-        //East
+        dir = "East";
     } else if (X == 3 && Y == 1) {
-        //South East
+        dir = "South East";
     } else if (X == 2 && Y == 0) {
-        //South 
-    } else if (X == 0 && Y == 0) {
-        //South West
+        dir = "South";
+    } else if (X == 1 && Y == 1) {
+        dir = "South West";
     } else if (X == 0 && Y == 2) {
-        // West
-    } else if (X == 0 && Y == 3) {
-        //North West
+        dir = "West";
+    } else if (X == 1 && Y == 3) {
+        dir = "North West";
     }
 
+serial.writeString(dir);
 
     //serial.writeValue("left_x", left_x)
     //serial.writeValue("left_y", left_y)
