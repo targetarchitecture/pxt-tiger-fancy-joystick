@@ -10,24 +10,24 @@ enum buttons {
 }
 
 enum direction {
-    //% block="THUMBSTICK LEFT"
+    //% block="None"
     NONE = 0,
-    //% block="THUMBSTICK LEFT"
-    NORTH = 0,
-    //% block="THUMBSTICK RIGHT" 
-    NORTH_EAST = 1,
-    //% block="LEFT"
-    EAST = 2,
-    //% block="RIGHT" 
-    SOUTH_EAST = 3,
-    //% block="RIGHT" 
-    SOUTH = 3,
-    //% block="RIGHT" 
-    SOUTH_WEST = 3,
-    //% block="RIGHT" 
-    WEST = 3,
-    //% block="RIGHT" 
-    NORTH_WEST = 3,
+    //% block="North"
+    NORTH = 1,
+    //% block="North East" 
+    NORTH_EAST = 2,
+    //% block="East"
+    EAST = 3,
+    //% block="South East" 
+    SOUTH_EAST = 4,
+    //% block="South" 
+    SOUTH = 5,
+    //% block="South West" 
+    SOUTH_WEST = 6,
+    //% block="West" 
+    WEST = 7,
+    //% block="North West" 
+    NORTH_WEST = 8,
 }
 
 enum key_status {
@@ -355,7 +355,7 @@ namespace joystick {
     //% shock.min=0 shock.max=1000
     //% weight=74
     //% inlineInputMode=inline
-    export function Gamepad_shock(shock: number): void {
+    export function SetVibration(shock: number): void {
         let a = AnalogPin.P1;
         pins.analogWritePin(a, shock)
     }
