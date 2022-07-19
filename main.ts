@@ -43,7 +43,7 @@ joystick.onLeftThumbstickMoved(function () {
         dir = "North West";
     }
 
-serial.writeString(dir);
+serial.writeString(dir + serial.NEW_LINE);
 
     //serial.writeValue("left_x", left_x)
     //serial.writeValue("left_y", left_y)
