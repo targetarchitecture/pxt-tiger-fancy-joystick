@@ -83,6 +83,7 @@ namespace joystick {
     /**
       * Add into the start function to initialise the joystick.
     */
+    //% weight=1
     //% block="Start Joystick"
     export function start(): void {
 
@@ -151,7 +152,7 @@ namespace joystick {
      * @param handler body code to run when the event is raised
      */
     //% block="on button pressed %button"
-    //% weight=65
+    //% weight=10
     export function onButtonPressed(
         button: buttons,
         handler: () => void
@@ -170,7 +171,7 @@ namespace joystick {
  * @param handler body code to run when the event is raised
  */
     //% block="on left thumbstick moved"
-    //% weight=65
+    //% weight=20
     export function onLeftThumbstickMoved(
         handler: () => void
     ) {
@@ -188,7 +189,7 @@ namespace joystick {
 * @param handler body code to run when the event is raised
 */
     //% block="on right thumbstick moved"
-    //% weight=65
+    //% weight=30
     export function onRightThumbstickMoved(
         handler: () => void
     ) {
@@ -327,7 +328,7 @@ namespace joystick {
     //% weight=74
     //% inlineInputMode=inline
      function isButtonPressed(button: buttons): boolean {
-        if (buttonStatus(button) != NONE_PRESS && buttonStatus(button) != 0xff) {
+         if (getButtonStatus(button) != NONE_PRESS && getButtonStatus(button) != 0xff) {
             return true;
         }
         return false;
@@ -337,16 +338,16 @@ namespace joystick {
     //% weight=74
     //% inlineInputMode=inline
      function isButtonReleased(button: buttons): boolean {
-        if (buttonStatus(button) == NONE_PRESS) {
+         if (getButtonStatus(button) == NONE_PRESS) {
             return true;
         }
         return false;
     }
 
     //% blockId=buttonStatus block="Get button %button status"
-    //% weight=74
+    //% weight=60
     //% inlineInputMode=inline
-    export function buttonStatus(button: buttons): key_status {
+    export function getButtonStatus(button: buttons): key_status {
         //return Get_Button_Status(button)
         switch (button) {
             case 0:
@@ -364,7 +365,7 @@ namespace joystick {
 
     //% blockId=Gamepad_shock block="Set vibration to %shock"  
     //% shock.min=0 shock.max=1000
-    //% weight=74
+    //% weight=40
     //% inlineInputMode=inline
     export function setVibration(shock: number): void {
         let a = AnalogPin.P1;
@@ -373,7 +374,7 @@ namespace joystick {
 
     //% blockId=SetBuzzer block="Set buzzer to %freq frequency"
     //% freq.min=0 freq.max=1000
-    //% weight=74
+    //% weight=50
     export function setBuzzer(freq: number): void {
         let a = AnalogPin.P0;
         pins.analogWritePin(a, freq)
@@ -381,7 +382,7 @@ namespace joystick {
 
 
     //% blockId=GetStickAxis block="Stick %stick axis %axial"
-    //% weight=74
+    //% weight=70
     //% inlineInputMode=inline
     export function getThumbstickAxis(stick: Stick, axial: Axis) {
         let val = 0;
@@ -404,6 +405,9 @@ namespace joystick {
 
 
     //https://blackdoor.github.io/blog/thumbstick-controls/
+    //% blockId=getDirection block="Get compass based direction for %stick"
+    //% weight=80
+    //% inlineInputMode=inline
     export function getDirection(stick: Stick): direction {
 
         let X = 0;
