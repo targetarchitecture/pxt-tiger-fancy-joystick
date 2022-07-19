@@ -82,7 +82,7 @@ namespace joystick {
 
     /**
       * Add into the start function to initialise the joystick.
-      */
+    */
     //% block="Start Joystick"
     export function start(): void {
 
@@ -308,7 +308,46 @@ namespace joystick {
 
     let NONE_PRESS = 8;
 
-    function Get_Button_Status(button: number) {
+    // function Get_Button_Status(button: number) {
+    //     switch (button) {
+    //         case 0:
+    //             return BUTTON_LEFT;
+    //         case 1:
+    //             return BUTTON_RIGHT;
+    //         case 2:
+    //             return THUMBSTICK_BUTTON_LEFT;
+    //         case 3:
+    //             return THUMBSTICK_BUTTON_RIGHT;
+    //         default:
+    //             return 0xff;
+    //     }
+    // }
+
+    //% blockId=isButtonPressed block="Is button %button pressed?"
+    //% weight=74
+    //% inlineInputMode=inline
+    export function isButtonPressed(button: buttons): boolean {
+        if (buttonStatus(button) != NONE_PRESS && buttonStatus(button) != 0xff) {
+            return true;
+        }
+        return false;
+    }
+
+    //% blockId=isButtonReleased block="Is button %button released?"
+    //% weight=74
+    //% inlineInputMode=inline
+    export function isButtonReleased(button: buttons): boolean {
+        if (buttonStatus(button) == NONE_PRESS) {
+            return true;
+        }
+        return false;
+    }
+
+    //% blockId=buttonStatus block="Get button %button status"
+    //% weight=74
+    //% inlineInputMode=inline
+    export function buttonStatus(button: buttons): key_status {
+        //return Get_Button_Status(button)
         switch (button) {
             case 0:
                 return BUTTON_LEFT;
@@ -321,34 +360,6 @@ namespace joystick {
             default:
                 return 0xff;
         }
-    }
-
-    //% blockId=isButtonPressed block="Is button %button pressed?"
-    //% weight=74
-    //% inlineInputMode=inline
-    export function isButtonPressed(button: buttons): boolean {
-        let buttonStatus = Get_Button_Status(button);
-        if (buttonStatus != NONE_PRESS && buttonStatus != 0xff) {
-            return true;
-        }
-        return false;
-    }
-
-    //% blockId=isButtonReleased block="Is button %button released?"
-    //% weight=74
-    //% inlineInputMode=inline
-    export function isButtonReleased(button: buttons): boolean {
-        if (Get_Button_Status(button) == NONE_PRESS) {
-            return true;
-        }
-        return false;
-    }
-
-    //% blockId=buttonStatus block="Get button %button status"
-    //% weight=74
-    //% inlineInputMode=inline
-    export function buttonStatus(button: buttons): key_status {
-        return Get_Button_Status(button)
     }
 
     //% blockId=Gamepad_shock block="Set vibration to %shock"  
@@ -369,10 +380,10 @@ namespace joystick {
     }
 
 
-    //% blockId=ReadStickAxis block="Stick %stick axis %axial"
+    //% blockId=GetStickAxis block="Stick %stick axis %axial"
     //% weight=74
     //% inlineInputMode=inline
-    export function ReadStickAxis(stick: Stick, axial: Axis) {
+    export function GetThumbstickAxis(stick: Stick, axial: Axis) {
         let val = 0;
         if (stick == 0) {
             if (axial == 0) {

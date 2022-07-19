@@ -13,8 +13,8 @@ input.onButtonPressed(Button.A, function () {
 })
 
 joystick.onLeftThumbstickMoved(function () {
-    left_x = joystick.ReadStickAxis(Stick.LEFT, Axis.X_AXIS)
-    left_y = joystick.ReadStickAxis(Stick.LEFT, Axis.Y_AXIS)
+    left_x = joystick.GetThumbstickAxis(Stick.LEFT, Axis.X_AXIS)
+    left_y = joystick.GetThumbstickAxis(Stick.LEFT, Axis.Y_AXIS)
     sendRadioMessage("LX:" + left_x + ",LY:" + left_y)
     led.toggle(2, 2)
     //serial.writeString("" + joystick.getDirection(Stick.LEFT) + serial.NEW_LINE)
@@ -35,8 +35,8 @@ function sendRadioMessage(message: string) {
 }
 
 joystick.onRightThumbstickMoved(function () {
-    right_x = joystick.ReadStickAxis(Stick.RIGHT, Axis.X_AXIS)
-    right_y = joystick.ReadStickAxis(Stick.RIGHT, Axis.Y_AXIS)
+    right_x = joystick.GetThumbstickAxis(Stick.RIGHT, Axis.X_AXIS)
+    right_y = joystick.GetThumbstickAxis(Stick.RIGHT, Axis.Y_AXIS)
     sendRadioMessage("RX:" + right_x + ",RY:" + right_y)
     led.toggle(2, 2)
 })
