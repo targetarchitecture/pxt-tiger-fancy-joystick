@@ -10,7 +10,7 @@ input.onButtonPressed(Button.A, function () {
     basic.pause(1000)
     joystick.setVibration(0)
 })
-// serial.writeString("" + joystick.getDirection(Stick.LEFT) + serial.NEW_LINE)
+
 joystick.onLeftThumbstickMoved(function () {
     left_x = joystick.getThumbstickAxis(Stick.LEFT, Axis.X_AXIS)
     left_y = joystick.getThumbstickAxis(Stick.LEFT, Axis.Y_AXIS)
