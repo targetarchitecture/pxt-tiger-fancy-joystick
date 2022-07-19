@@ -84,7 +84,7 @@ namespace joystick {
       * Add into the start function to initialise the joystick.
     */
     //% weight=100
-    //% block="Start Joystick"
+    //% blockId="start" block="Start Joystick"
     export function start(): void {
 
         //prevent running more than once
@@ -151,7 +151,7 @@ namespace joystick {
      * @param button the button to be checked
      * @param handler body code to run when the event is raised
      */
-    //% block="on button pressed %button"
+    //% blockId=onButtonPressed  block="on button pressed %button"
     //% weight=90
     export function onButtonPressed(
         button: buttons,
@@ -170,7 +170,7 @@ namespace joystick {
  * Do something when left thumbstick is moved.
  * @param handler body code to run when the event is raised
  */
-    //% block="on left thumbstick moved"
+    //% blockId=onLeftThumbstickMoved block="on left thumbstick moved"
     //% weight=80
     export function onLeftThumbstickMoved(
         handler: () => void
@@ -188,7 +188,7 @@ namespace joystick {
 * Do something when right thumbstick is moved.
 * @param handler body code to run when the event is raised
 */
-    //% block="on right thumbstick moved"
+    //% blockId=onRightThumbstickMoved block="on right thumbstick moved"
     //% weight=70
     export function onRightThumbstickMoved(
         handler: () => void
@@ -344,11 +344,10 @@ namespace joystick {
         return false;
     }
 
-    //% blockId=buttonStatus block="Read %button button status"
+    //% blockId=getButtonStatus block="Read %button button status"
     //% weight=45
     //% inlineInputMode=inline
     export function getButtonStatus(button: buttons): key_status {
-        //return Get_Button_Status(button)
         switch (button) {
             case 0:
                 return BUTTON_LEFT;
@@ -363,7 +362,7 @@ namespace joystick {
         }
     }
 
-    //% blockId=Gamepad_shock block="Set vibration to %shock"  
+    //% blockId=setVibration block="Set vibration to %shock"
     //% shock.min=0 shock.max=1000
     //% weight=46
     //% inlineInputMode=inline
@@ -372,7 +371,7 @@ namespace joystick {
         pins.analogWritePin(a, shock)
     }
 
-    //% blockId=SetBuzzer block="Set buzzer to %freq frequency"
+    //% blockId=setBuzzer block="Set buzzer to %freq frequency"
     //% freq.min=0 freq.max=1000
     //% weight=47
     export function setBuzzer(freq: number): void {
@@ -380,7 +379,7 @@ namespace joystick {
         pins.analogWritePin(a, freq)
     }
 
-    //% blockId=GetStickAxis block="Read %stick thumbstick axis %axial value"
+    //% blockId=getThumbstickAxis block="Read %stick thumbstick axis %axial value"
     //% weight=10
     //% inlineInputMode=inline
     export function getThumbstickAxis(stick: Stick, axial: Axis) {
