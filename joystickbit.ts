@@ -9,6 +9,27 @@ enum buttons {
     BUTTON_RIGHT = 3,
 }
 
+enum direction {
+    //% block="THUMBSTICK LEFT"
+    NONE = 0,
+    //% block="THUMBSTICK LEFT"
+    NORTH = 0,
+    //% block="THUMBSTICK RIGHT" 
+    NORTH_EAST = 1,
+    //% block="LEFT"
+    EAST = 2,
+    //% block="RIGHT" 
+    SOUTH_EAST = 3,
+    //% block="RIGHT" 
+    SOUTH = 3,
+    //% block="RIGHT" 
+    SOUTH_WEST = 3,
+    //% block="RIGHT" 
+    WEST = 3,
+    //% block="RIGHT" 
+    NORTH_WEST = 3,
+}
+
 enum key_status {
     //% block="DOWN"
     PRESS_DOWN = 0,   //press
@@ -48,7 +69,7 @@ namespace joystick {
     const THUMBSTICK_RIGHT_MOVED = 7010;
     const pinOffset = 1000;
     const centered = 128;
-    
+
     let PREV_THUMBSTICK_LEFT = -1
     let PREV_THUMBSTICK_RIGHT = -1
     let PREV_BUTTON_LEFT = -1
@@ -100,9 +121,9 @@ namespace joystick {
                 if (PREV_BUTTON_RIGHT == 0 && BUTTON_RIGHT == 1) {
                     control.raiseEvent(SWITCH_PRESSED + buttons.BUTTON_RIGHT, buttons.BUTTON_RIGHT + pinOffset)
                 }
-                PREV_BUTTON_RIGHT = BUTTON_RIGHT               
+                PREV_BUTTON_RIGHT = BUTTON_RIGHT
 
-               //thumbsticks
+                //thumbsticks
                 THUMBSTICK_LEFT_X = i2cread(THUMBSTICK_I2C_ADDR, THUMBSTICK_LEFT_X_REG);
                 THUMBSTICK_LEFT_Y = i2cread(THUMBSTICK_I2C_ADDR, THUMBSTICK_LEFT_Y_REG);
                 THUMBSTICK_RIGHT_X = i2cread(THUMBSTICK_I2C_ADDR, THUMBSTICK_RIGHT_X_REG);
@@ -355,59 +376,54 @@ namespace joystick {
         let val = 0;
         if (stick == 0) {
             if (axial == 0) {
-                val =  THUMBSTICK_LEFT_X;
+                val = THUMBSTICK_LEFT_X;
             } else {
-                val =  THUMBSTICK_LEFT_Y;
+                val = THUMBSTICK_LEFT_Y;
             }
         } else {
             if (axial == 0) {
-                val =  THUMBSTICK_RIGHT_X;
+                val = THUMBSTICK_RIGHT_X;
             } else {
-                val =  THUMBSTICK_RIGHT_Y;
+                val = THUMBSTICK_RIGHT_Y;
             }
         }
         return val;
     }
 
-// //https://blackdoor.github.io/blog/thumbstick-controls/
-//     export  function getAngleFromXY(XAxisValue: number, YAxisValue: number) : number
-//     {
-//         //Normally Atan2 takes Y,X, not X,Y.  We switch these around since we want 0
-//         // degrees to be straight up, not to the right like the unit circle;
-//       let  angleInRadians = Math.atan2(XAxisValue, YAxisValue);
 
-//         //Atan2 gives us a negative value for angles in the 3rd and 4th quadrants.
-//         // We want a full 360 degrees, so we will add 2 PI to negative values.
-//         if (angleInRadians < 0.0) {angleInRadians += (Math.PI * 2.0)};
 
-//         //Convert the radians to degrees.  Degrees are easier to visualize.
-//         let angleInDegrees = (180.0 * angleInRadians / Math.PI);
+    //https://blackdoor.github.io/blog/thumbstick-controls/
+    export function getDirection(stick: Stick): direction {
 
-//         return angleInDegrees;
-//     }
+        let X = 0;
+        let Y = 0;
+        if (stick == Stick.LEFT) {
+            X = Math.trunc(Math.map(THUMBSTICK_LEFT_X, 0, 255, 0, 4));
+            Y = Math.trunc(Math.map(THUMBSTICK_LEFT_Y, 0, 255, 0, 4));
+        } else {
+            X = Math.trunc(Math.map(THUMBSTICK_RIGHT_X, 0, 255, 0, 4));
+            Y = Math.trunc(Math.map(THUMBSTICK_RIGHT_Y, 0, 255, 0, 4));
+        }
 
-//  export   function convertXYtoDirection(X: number ,Y: number) : number
-//     {
-//         //We have 8 sectors, so get the size of each in degrees.
-//         let sectorSize = 360.0 / 8;
-
-//         //We also need the size of half a sector
-//         let halfSectorSize = sectorSize / 2.0;
-
-//         //First, get the angle using the function above
-//         let thumbstickAngle = getAngleFromXY(X, Y);
-
-//         //Next, rotate our angle to match the offset of our sectors.
-//         let convertedAngle = thumbstickAngle + halfSectorSize;
-
-//         //Finally, we get the current direction by dividing the angle
-//         // by the size of the sectors
-//         let direction =  Math.floor(convertedAngle / sectorSize);
-
-//         //the result directions map as follows:
-//         // 0 = UP, 1 = UP-RIGHT, 2 = RIGHT ... 7 = UP-LEFT.
-//         return direction;
-//     }
-
+        if (X == 2 && Y == 4) {
+            return direction.NORTH;
+        } else if (X == 3 && Y == 3) {
+            return direction.NORTH_EAST;
+        } else if (X == 4 && Y == 2) {
+            return direction.EAST;
+        } else if (X == 3 && Y == 1) {
+            return direction.SOUTH_EAST;
+        } else if (X == 2 && Y == 0) {
+            return direction.SOUTH;
+        } else if (X == 1 && Y == 1) {
+            return direction.SOUTH_WEST;
+        } else if (X == 0 && Y == 2) {
+            return direction.WEST;
+        } else if (X == 1 && Y == 3) {
+            return direction.NORTH_WEST;
+        } else {
+            return direction.NONE;
+        }
+    }
 
 }
