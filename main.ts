@@ -1,3 +1,4 @@
+
 joystick.onButtonPressed(buttons.BUTTON_LEFT, function () {
     led.toggle(0, 2)
 })
@@ -24,7 +25,7 @@ input.onButtonPressed(Button.B, function () {
 joystick.onButtonPressed(buttons.BUTTON_RIGHT, function () {
     led.toggle(4, 2)
 })
-function sendRadioMessage (message: string) {
+function sendRadioMessage(message: string) {
     radio.sendString(message)
     lastCommandSend = control.millis()
 }
@@ -34,7 +35,7 @@ joystick.onRightThumbstickMoved(function () {
     sendRadioMessage("RX:" + right_x + ",RY:" + right_y)
     led.toggle(2, 2)
 })
-function initRadio (message: string) {
+function initRadio(message: string) {
     radio.setTransmitPower(7)
     radio.setFrequencyBand(76)
     radio.setGroup(76)

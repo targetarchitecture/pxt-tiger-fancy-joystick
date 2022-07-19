@@ -84,7 +84,7 @@ namespace joystick {
       * Add into the start function to initialise the joystick.
     */
     //% weight=100
-    //% blockId="start" block="Start Joystick"
+    //% blockId="startjoystick" block="Start Joystick"
     export function start(): void {
 
         //prevent running more than once
