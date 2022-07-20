@@ -1,11 +1,14 @@
 
 joystick.onButtonPressed(buttons.BUTTON_LEFT, function () {
     led.toggle(0, 2)
+    sendRadioMessage("BL");
 })
 joystick.onButtonPressed(buttons.THUMBSTICK_LEFT, function () {
     led.toggle(0, 2)
+    sendRadioMessage("TL");
 })
 input.onButtonPressed(Button.A, function () {
+    sendRadioMessage("BA");
     joystick.setVibration(1000)
     basic.pause(1000)
     joystick.setVibration(0)
@@ -18,12 +21,15 @@ joystick.onLeftThumbstickMoved(function () {
     led.toggle(2, 2)
 })
 input.onButtonPressed(Button.B, function () {
+    sendRadioMessage("BB");
     joystick.setBuzzer(500)
     basic.pause(1000)
     joystick.setBuzzer(0)
+   
 })
 joystick.onButtonPressed(buttons.BUTTON_RIGHT, function () {
     led.toggle(4, 2)
+    sendRadioMessage("BR");
 })
 function sendRadioMessage(message: string) {
     radio.sendString(message)
@@ -44,6 +50,7 @@ function initRadio(message: string) {
 }
 joystick.onButtonPressed(buttons.THUMBSTICK_RIGHT, function () {
     led.toggle(4, 2)
+    sendRadioMessage("TR");
 })
 let right_y = 0
 let right_x = 0
