@@ -1,10 +1,7 @@
 
-> Open this page at [https://targetarchitecture.github.io/tiger-fancy-joystick/](https://targetarchitecture.github.io/tiger-fancy-joystick/)
-
-
 Joystick: Bit is a wireless programmable controller developed for Micro: Bit, which is produced by [Shenzhen E-Innovation Space Technology Co., Ltd.](www.emakefun.com) and supports Micro: Bit V1 and V2
 
-![image](imgs/61.jpg)
+![1](https://github.com/targetarchitecture/pxt-tiger-fancy-joystick/blob/master/imgs/61.jpg?raw=true)
 
 https://github.com/emakefun/pxt-joystickbit
 
@@ -50,6 +47,7 @@ This image shows the blocks code from the last commit in master.
 This image may take a few minutes to refresh.
 
 ![image](imgs/microbit-screenshot.jpg)
+![image](https://github.com/targetarchitecture/pxt-tiger-fancy-joystick/blob/master/imgs/microbit-screenshot.jpg?raw=true)
 
 #### Metadata (used for search, rendering)
 
