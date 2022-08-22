@@ -68,9 +68,9 @@ namespace joystick {
     const THUMBSTICK_LEFT_MOVED = 6010;
     const THUMBSTICK_RIGHT_MOVED = 7010;
     const pinOffset = 1000;
-    const centered = 128;
+    export const centered = 128;
     const timeToRepeatMs = 50;
-    const timeToSettleMs = 1000;
+    const timeToSettleMs = 100;
 
     const SMOOTHING_WINDOW_SIZE = 1000 / timeToRepeatMs;
     let THUMBSTICK_LEFT_X_AVERAGES: number[] = [];
@@ -100,7 +100,6 @@ namespace joystick {
     let PREV_THUMBSTICK_RIGHT_X = centered;
     let PREV_THUMBSTICK_RIGHT_Y = centered;
 
-    //export let THUMBSTICK_LEFT_X_AVG = centered;
 
     /**
       * Add into the start function to initialise the joystick.
@@ -137,7 +136,6 @@ namespace joystick {
             THUMBSTICK_LEFT_Y_AVERAGES[THUMBSTICK_LEFT_Y_AVERAGES_INDEX] = THUMBSTICK_LEFT_Y_RAW;
             THUMBSTICK_RIGHT_X_AVERAGES[THUMBSTICK_RIGHT_X_AVERAGES_INDEX] = THUMBSTICK_RIGHT_X_RAW;
             THUMBSTICK_RIGHT_Y_AVERAGES[THUMBSTICK_RIGHT_Y_AVERAGES_INDEX] = THUMBSTICK_RIGHT_Y_RAW;
-
 
             THUMBSTICK_LEFT_X_AVERAGES_INDEX = THUMBSTICK_LEFT_X_AVERAGES_INDEX + 1;
             THUMBSTICK_LEFT_Y_AVERAGES_INDEX = THUMBSTICK_LEFT_Y_AVERAGES_INDEX + 1;
@@ -195,28 +193,24 @@ namespace joystick {
         })
 
         //set-up event loop
-        loops.everyInterval(100, function () {
+        loops.everyInterval(timeToRepeatMs, function () {
             //led.toggle(1, 0)
 
             if (input.runningTime() > timeToSettleMs) {
 
                 //check for button clicks
-                // if (PREV_THUMBSTICK_LEFT == 0 && THUMBSTICK_BUTTON_LEFT == 1) {
                 if (PREV_THUMBSTICK_LEFT != THUMBSTICK_BUTTON_LEFT) {
                     control.raiseEvent(SWITCH_PRESSED + Buttons.THUMBSTICK_LEFT, Buttons.THUMBSTICK_LEFT + pinOffset)
                 }
 
-                //if (PREV_BUTTON_LEFT == 0 && BUTTON_LEFT == 1) {
                 if (PREV_BUTTON_LEFT != BUTTON_LEFT) {
                     control.raiseEvent(SWITCH_PRESSED + Buttons.BUTTON_LEFT, Buttons.BUTTON_LEFT + pinOffset)
                 }
 
-                //if (PREV_THUMBSTICK_RIGHT == 0 && THUMBSTICK_BUTTON_RIGHT == 1) {
                 if (PREV_THUMBSTICK_RIGHT != THUMBSTICK_BUTTON_RIGHT) {
                     control.raiseEvent(SWITCH_PRESSED + Buttons.THUMBSTICK_RIGHT, Buttons.THUMBSTICK_RIGHT + pinOffset)
                 }
 
-                //  if (PREV_BUTTON_RIGHT == 0 && BUTTON_RIGHT == 1) {
                 if (PREV_BUTTON_RIGHT != BUTTON_RIGHT) {
                     control.raiseEvent(SWITCH_PRESSED + Buttons.BUTTON_RIGHT, Buttons.BUTTON_RIGHT + pinOffset)
                 }
