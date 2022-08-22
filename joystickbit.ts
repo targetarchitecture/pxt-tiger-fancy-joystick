@@ -125,25 +125,50 @@ namespace joystick {
                 PREV_BUTTON_RIGHT = BUTTON_RIGHT
 
                 //thumbsticks
-                THUMBSTICK_LEFT_X = i2cread(THUMBSTICK_I2C_ADDR, THUMBSTICK_LEFT_X_REG);
-                THUMBSTICK_LEFT_Y = i2cread(THUMBSTICK_I2C_ADDR, THUMBSTICK_LEFT_Y_REG);
-                THUMBSTICK_RIGHT_X = i2cread(THUMBSTICK_I2C_ADDR, THUMBSTICK_RIGHT_X_REG);
-                THUMBSTICK_RIGHT_Y = i2cread(THUMBSTICK_I2C_ADDR, THUMBSTICK_RIGHT_Y_REG);
-
-                if (PREV_THUMBSTICK_LEFT_X != THUMBSTICK_LEFT_X || PREV_THUMBSTICK_LEFT_Y != THUMBSTICK_LEFT_Y) {
-                    control.raiseEvent(THUMBSTICK_LEFT_MOVED, THUMBSTICK_LEFT_X + THUMBSTICK_LEFT_Y);
-                }
-
-                if (PREV_THUMBSTICK_RIGHT_X != THUMBSTICK_RIGHT_X || PREV_THUMBSTICK_RIGHT_Y != THUMBSTICK_RIGHT_Y) {
-                    control.raiseEvent(THUMBSTICK_RIGHT_MOVED, THUMBSTICK_RIGHT_X + THUMBSTICK_RIGHT_Y);
-                }
-
-                PREV_THUMBSTICK_LEFT_X = THUMBSTICK_LEFT_X;
-                PREV_THUMBSTICK_LEFT_Y = THUMBSTICK_LEFT_Y;
-                PREV_THUMBSTICK_RIGHT_X = THUMBSTICK_RIGHT_X;
-                PREV_THUMBSTICK_RIGHT_Y = THUMBSTICK_RIGHT_Y;
+                leftThumbstick();
+                rightThumbstick();
             })
         })
+    }
+
+    function leftThumbstick() {
+        THUMBSTICK_LEFT_X = i2cread(THUMBSTICK_I2C_ADDR, THUMBSTICK_LEFT_X_REG);
+        THUMBSTICK_LEFT_Y = i2cread(THUMBSTICK_I2C_ADDR, THUMBSTICK_LEFT_Y_REG);
+
+        //delta
+        let LEFT_X_DELTA = Math.abs(PREV_THUMBSTICK_LEFT_X - THUMBSTICK_LEFT_X)
+        let LEFT_Y_DELTA = Math.abs(PREV_THUMBSTICK_LEFT_Y - THUMBSTICK_LEFT_Y)
+
+        //remember for next loop
+        PREV_THUMBSTICK_LEFT_X = THUMBSTICK_LEFT_X;
+        PREV_THUMBSTICK_LEFT_Y = THUMBSTICK_LEFT_Y;
+
+        if (((LEFT_X_DELTA <= 128) && (LEFT_X_DELTA > 0)) ||
+            ((LEFT_Y_DELTA <= 128) && (LEFT_Y_DELTA > 0))) {
+            serial.writeValue("LEFT_Y_DELTA", LEFT_Y_DELTA)
+            serial.writeValue("LEFT_X_DELTA", LEFT_X_DELTA)
+            //  control.raiseEvent(THUMBSTICK_LEFT_MOVED, THUMBSTICK_LEFT_X + THUMBSTICK_LEFT_Y);
+        }
+    }
+
+    function rightThumbstick() {
+        THUMBSTICK_RIGHT_X = i2cread(THUMBSTICK_I2C_ADDR, THUMBSTICK_RIGHT_X_REG);
+        THUMBSTICK_RIGHT_Y = i2cread(THUMBSTICK_I2C_ADDR, THUMBSTICK_RIGHT_Y_REG);
+
+        //delta
+        let RIGHT_X_DELTA = Math.abs(PREV_THUMBSTICK_RIGHT_X - THUMBSTICK_RIGHT_X)
+        let RIGHT_Y_DELTA = Math.abs(PREV_THUMBSTICK_RIGHT_Y - THUMBSTICK_RIGHT_Y)
+
+        //remember for next loop
+        PREV_THUMBSTICK_RIGHT_X = THUMBSTICK_RIGHT_X;
+        PREV_THUMBSTICK_RIGHT_Y = THUMBSTICK_RIGHT_Y;
+
+        if (((RIGHT_X_DELTA <= 128) && (RIGHT_X_DELTA > 0)) ||
+            ((RIGHT_Y_DELTA <= 128) && (RIGHT_Y_DELTA > 0))) {
+            serial.writeValue("RIGHT_Y_DELTA", RIGHT_Y_DELTA)
+            serial.writeValue("RIGHT_X_DELTA", RIGHT_X_DELTA)
+            control.raiseEvent(THUMBSTICK_RIGHT_MOVED, THUMBSTICK_RIGHT_X + THUMBSTICK_RIGHT_Y);
+        }
     }
 
     /**
@@ -327,8 +352,8 @@ namespace joystick {
     //% blockId=isButtonPressed block="Is button %button pressed?"
     //% weight=0
     //% inlineInputMode=inline
-     function isButtonPressed(button: buttons): boolean {
-         if (getButtonStatus(button) != NONE_PRESS && getButtonStatus(button) != 0xff) {
+    function isButtonPressed(button: buttons): boolean {
+        if (getButtonStatus(button) != NONE_PRESS && getButtonStatus(button) != 0xff) {
             return true;
         }
         return false;
@@ -337,8 +362,8 @@ namespace joystick {
     //% blockId=isButtonReleased block="Is button %button released?"
     //% weight=0
     //% inlineInputMode=inline
-     function isButtonReleased(button: buttons): boolean {
-         if (getButtonStatus(button) == NONE_PRESS) {
+    function isButtonReleased(button: buttons): boolean {
+        if (getButtonStatus(button) == NONE_PRESS) {
             return true;
         }
         return false;
