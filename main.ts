@@ -1,9 +1,9 @@
 
-joystick.onButtonPressed(buttons.BUTTON_LEFT, function () {
+joystick.onButtonPressed(Buttons.BUTTON_LEFT, function () {
     led.toggle(0, 2)
     sendRadioMessage("BL");
 })
-joystick.onButtonPressed(buttons.THUMBSTICK_LEFT, function () {
+joystick.onButtonPressed(Buttons.THUMBSTICK_LEFT, function () {
     led.toggle(0, 2)
     sendRadioMessage("TL");
 })
@@ -29,7 +29,7 @@ input.onButtonPressed(Button.B, function () {
 
 })
 
-joystick.onButtonPressed(buttons.BUTTON_RIGHT, function () {
+joystick.onButtonPressed(Buttons.BUTTON_RIGHT, function () {
     led.toggle(4, 2)
     sendRadioMessage("BR");
 })
@@ -53,7 +53,7 @@ function initRadio(message: string) {
     sendRadioMessage(message)
 }
 
-joystick.onButtonPressed(buttons.THUMBSTICK_RIGHT, function () {
+joystick.onButtonPressed(Buttons.THUMBSTICK_RIGHT, function () {
     led.toggle(4, 2)
     sendRadioMessage("TR");
 })
@@ -67,9 +67,9 @@ joystick.start()
 initRadio("START")
 
 loops.everyInterval(100, function () {
-    serial.writeValue("LEFT_X", joystick.THUMBSTICK_LEFT_X_AVG); //.getThumbstickAxis(Stick.LEFT, Axis.X_AXIS));
-    // serial.writeValue("LEFT_Y", joystick.getThumbstickAxis(Stick.LEFT, Axis.Y_AXIS));
-    // serial.writeValue("RIGHT_X", joystick.getThumbstickAxis(Stick.RIGHT, Axis.X_AXIS));
-    // serial.writeValue("RIGHT_Y", joystick.getThumbstickAxis(Stick.RIGHT, Axis.Y_AXIS));
+    serial.writeValue("LEFT_X", joystick.getThumbstickAxis(Stick.LEFT, Axis.X_AXIS));
+    serial.writeValue("LEFT_Y", joystick.getThumbstickAxis(Stick.LEFT, Axis.Y_AXIS));
+ serial.writeValue("RIGHT_X", joystick.getThumbstickAxis(Stick.RIGHT, Axis.X_AXIS));
+     serial.writeValue("RIGHT_Y", joystick.getThumbstickAxis(Stick.RIGHT, Axis.Y_AXIS));
 })
 

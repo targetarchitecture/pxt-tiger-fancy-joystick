@@ -1,4 +1,4 @@
-enum buttons {
+enum Buttons {
     //% block="THUMBSTICK LEFT"
     THUMBSTICK_LEFT = 0,
     //% block="THUMBSTICK RIGHT" 
@@ -9,7 +9,7 @@ enum buttons {
     BUTTON_RIGHT = 3,
 }
 
-enum direction {
+enum Direction {
     //% block="None"
     NONE = 0,
     //% block="North"
@@ -30,7 +30,7 @@ enum direction {
     NORTH_WEST = 8,
 }
 
-enum key_status {
+enum KeyStatus {
     //% block="DOWN"
     PRESS_DOWN = 0,   //press
     //% block="UP"
@@ -69,9 +69,10 @@ namespace joystick {
     const THUMBSTICK_RIGHT_MOVED = 7010;
     const pinOffset = 1000;
     const centered = 128;
+    const timeToRepeatMs = 50;
     const timeToSettleMs = 1000;
 
-    const SMOOTHING_WINDOW_SIZE = 1000 / 50;
+    const SMOOTHING_WINDOW_SIZE = 1000 / timeToRepeatMs;
     let THUMBSTICK_LEFT_X_AVERAGES: number[] = [];
     let THUMBSTICK_LEFT_Y_AVERAGES: number[] = [];
     let THUMBSTICK_RIGHT_X_AVERAGES: number[] = [];
@@ -99,7 +100,7 @@ namespace joystick {
     let PREV_THUMBSTICK_RIGHT_X = centered;
     let PREV_THUMBSTICK_RIGHT_Y = centered;
 
-    export let THUMBSTICK_LEFT_X_AVG = centered;
+    //export let THUMBSTICK_LEFT_X_AVG = centered;
 
     /**
       * Add into the start function to initialise the joystick.
@@ -116,7 +117,7 @@ namespace joystick {
         }
 
         //set-up I2C fetch loop
-        loops.everyInterval(50, function () {
+        loops.everyInterval(timeToRepeatMs, function () {
             //led.toggle(0, 0)
             BUTTON_LEFT = i2cread(THUMBSTICK_I2C_ADDR, BUTTON_LEFT_REG);
             BUTTON_RIGHT = i2cread(THUMBSTICK_I2C_ADDR, BUTTON_RIGHT_REG);
@@ -124,21 +125,37 @@ namespace joystick {
             THUMBSTICK_BUTTON_LEFT = i2cread(THUMBSTICK_I2C_ADDR, THUMBSTICK_BUTTON_LEFT_REG);
             THUMBSTICK_BUTTON_RIGHT = i2cread(THUMBSTICK_I2C_ADDR, THUMBSTICK_BUTTON_RIGHT_REG);
 
-            THUMBSTICK_LEFT_X = i2cread(THUMBSTICK_I2C_ADDR, THUMBSTICK_LEFT_X_REG);
-            THUMBSTICK_LEFT_Y = i2cread(THUMBSTICK_I2C_ADDR, THUMBSTICK_LEFT_Y_REG);
-
-            THUMBSTICK_RIGHT_X = i2cread(THUMBSTICK_I2C_ADDR, THUMBSTICK_RIGHT_X_REG);
-            THUMBSTICK_RIGHT_Y = i2cread(THUMBSTICK_I2C_ADDR, THUMBSTICK_RIGHT_Y_REG);
+            THUMBSTICK_LEFT_X_RAW = i2cread(THUMBSTICK_I2C_ADDR, THUMBSTICK_LEFT_X_REG);
+            THUMBSTICK_LEFT_Y_RAW = i2cread(THUMBSTICK_I2C_ADDR, THUMBSTICK_LEFT_Y_REG);
+            THUMBSTICK_RIGHT_X_RAW = i2cread(THUMBSTICK_I2C_ADDR, THUMBSTICK_RIGHT_X_REG);
+            THUMBSTICK_RIGHT_Y_RAW = i2cread(THUMBSTICK_I2C_ADDR, THUMBSTICK_RIGHT_Y_REG);
         })
 
-        loops.everyInterval(50, function () {
+        loops.everyInterval(timeToRepeatMs, function () {
 
-            THUMBSTICK_LEFT_X_AVERAGES[THUMBSTICK_LEFT_X_AVERAGES_INDEX] = THUMBSTICK_LEFT_X;
+            THUMBSTICK_LEFT_X_AVERAGES[THUMBSTICK_LEFT_X_AVERAGES_INDEX] = THUMBSTICK_LEFT_X_RAW;
+            THUMBSTICK_LEFT_Y_AVERAGES[THUMBSTICK_LEFT_Y_AVERAGES_INDEX] = THUMBSTICK_LEFT_Y_RAW;
+            THUMBSTICK_RIGHT_X_AVERAGES[THUMBSTICK_RIGHT_X_AVERAGES_INDEX] = THUMBSTICK_RIGHT_X_RAW;
+            THUMBSTICK_RIGHT_Y_AVERAGES[THUMBSTICK_RIGHT_Y_AVERAGES_INDEX] = THUMBSTICK_RIGHT_Y_RAW;
+
 
             THUMBSTICK_LEFT_X_AVERAGES_INDEX = THUMBSTICK_LEFT_X_AVERAGES_INDEX + 1;
+            THUMBSTICK_LEFT_Y_AVERAGES_INDEX = THUMBSTICK_LEFT_Y_AVERAGES_INDEX + 1;
+            THUMBSTICK_RIGHT_X_AVERAGES_INDEX = THUMBSTICK_RIGHT_X_AVERAGES_INDEX + 1;
+            THUMBSTICK_RIGHT_Y_AVERAGES_INDEX = THUMBSTICK_RIGHT_Y_AVERAGES_INDEX + 1;
 
             if (THUMBSTICK_LEFT_X_AVERAGES_INDEX > SMOOTHING_WINDOW_SIZE) {
                 THUMBSTICK_LEFT_X_AVERAGES_INDEX = 0;
+            }
+            if (THUMBSTICK_LEFT_Y_AVERAGES_INDEX > SMOOTHING_WINDOW_SIZE) {
+                THUMBSTICK_LEFT_Y_AVERAGES_INDEX = 0;
+            }
+
+            if (THUMBSTICK_RIGHT_X_AVERAGES_INDEX > SMOOTHING_WINDOW_SIZE) {
+                THUMBSTICK_RIGHT_X_AVERAGES_INDEX = 0;
+            }
+            if (THUMBSTICK_RIGHT_Y_AVERAGES_INDEX > SMOOTHING_WINDOW_SIZE) {
+                THUMBSTICK_RIGHT_Y_AVERAGES_INDEX = 0;
             }
 
             let avg = 0;
@@ -149,6 +166,32 @@ namespace joystick {
 
             THUMBSTICK_LEFT_X_AVG = Math.trunc(avg / SMOOTHING_WINDOW_SIZE);
 
+            //reset to zero
+            avg = 0;
+
+            for (let i = 0; i < SMOOTHING_WINDOW_SIZE; i++) {
+                avg = avg + THUMBSTICK_LEFT_Y_AVERAGES[i];
+            }
+
+            THUMBSTICK_LEFT_Y_AVG = Math.trunc(avg / SMOOTHING_WINDOW_SIZE);
+
+            //reset to zero
+            avg = 0;
+
+            for (let i = 0; i < SMOOTHING_WINDOW_SIZE; i++) {
+                avg = avg + THUMBSTICK_RIGHT_X_AVERAGES[i];
+            }
+
+            THUMBSTICK_RIGHT_X_AVG = Math.trunc(avg / SMOOTHING_WINDOW_SIZE);
+
+            //reset to zero
+            avg = 0;
+
+            for (let i = 0; i < SMOOTHING_WINDOW_SIZE; i++) {
+                avg = avg + THUMBSTICK_RIGHT_Y_AVERAGES[i];
+            }
+
+            THUMBSTICK_RIGHT_Y_AVG = Math.trunc(avg / SMOOTHING_WINDOW_SIZE);
         })
 
         //set-up event loop
@@ -160,22 +203,22 @@ namespace joystick {
                 //check for button clicks
                 // if (PREV_THUMBSTICK_LEFT == 0 && THUMBSTICK_BUTTON_LEFT == 1) {
                 if (PREV_THUMBSTICK_LEFT != THUMBSTICK_BUTTON_LEFT) {
-                    control.raiseEvent(SWITCH_PRESSED + buttons.THUMBSTICK_LEFT, buttons.THUMBSTICK_LEFT + pinOffset)
+                    control.raiseEvent(SWITCH_PRESSED + Buttons.THUMBSTICK_LEFT, Buttons.THUMBSTICK_LEFT + pinOffset)
                 }
 
                 //if (PREV_BUTTON_LEFT == 0 && BUTTON_LEFT == 1) {
                 if (PREV_BUTTON_LEFT != BUTTON_LEFT) {
-                    control.raiseEvent(SWITCH_PRESSED + buttons.BUTTON_LEFT, buttons.BUTTON_LEFT + pinOffset)
+                    control.raiseEvent(SWITCH_PRESSED + Buttons.BUTTON_LEFT, Buttons.BUTTON_LEFT + pinOffset)
                 }
 
                 //if (PREV_THUMBSTICK_RIGHT == 0 && THUMBSTICK_BUTTON_RIGHT == 1) {
                 if (PREV_THUMBSTICK_RIGHT != THUMBSTICK_BUTTON_RIGHT) {
-                    control.raiseEvent(SWITCH_PRESSED + buttons.THUMBSTICK_RIGHT, buttons.THUMBSTICK_RIGHT + pinOffset)
+                    control.raiseEvent(SWITCH_PRESSED + Buttons.THUMBSTICK_RIGHT, Buttons.THUMBSTICK_RIGHT + pinOffset)
                 }
 
                 //  if (PREV_BUTTON_RIGHT == 0 && BUTTON_RIGHT == 1) {
                 if (PREV_BUTTON_RIGHT != BUTTON_RIGHT) {
-                    control.raiseEvent(SWITCH_PRESSED + buttons.BUTTON_RIGHT, buttons.BUTTON_RIGHT + pinOffset)
+                    control.raiseEvent(SWITCH_PRESSED + Buttons.BUTTON_RIGHT, Buttons.BUTTON_RIGHT + pinOffset)
                 }
 
                 //set previous button state
@@ -193,43 +236,26 @@ namespace joystick {
 
     function leftThumbstick() {
 
-        //delta
-        let LEFT_X_DELTA = Math.abs(PREV_THUMBSTICK_LEFT_X - THUMBSTICK_LEFT_X)
-        let LEFT_Y_DELTA = Math.abs(PREV_THUMBSTICK_LEFT_Y - THUMBSTICK_LEFT_Y)
+        if (THUMBSTICK_LEFT_X_AVG != PREV_THUMBSTICK_LEFT_X ||
+            THUMBSTICK_LEFT_Y_AVG != PREV_THUMBSTICK_LEFT_Y) {
+            control.raiseEvent(THUMBSTICK_LEFT_MOVED, THUMBSTICK_LEFT_X_AVG + THUMBSTICK_LEFT_Y_AVG);
+        }
 
         //remember for next loop
-        PREV_THUMBSTICK_LEFT_X = THUMBSTICK_LEFT_X;
-        PREV_THUMBSTICK_LEFT_Y = THUMBSTICK_LEFT_Y;
-
-        if (((LEFT_X_DELTA < 128) && (LEFT_X_DELTA > 0)) ||
-            ((LEFT_Y_DELTA < 128) && (LEFT_Y_DELTA > 0))) {
-
-            // if ((LEFT_X_DELTA > 0) || (LEFT_Y_DELTA > 0)) {
-            //  serial.writeValue("LEFT_Y_DELTA", LEFT_Y_DELTA)
-            //  serial.writeValue("LEFT_X_DELTA", LEFT_X_DELTA)
-            control.raiseEvent(THUMBSTICK_LEFT_MOVED, THUMBSTICK_LEFT_X + THUMBSTICK_LEFT_Y);
-        }
+        PREV_THUMBSTICK_LEFT_X = THUMBSTICK_LEFT_X_AVG;
+        PREV_THUMBSTICK_LEFT_Y = THUMBSTICK_LEFT_Y_AVG;
     }
 
     function rightThumbstick() {
 
-        //delta
-        let RIGHT_X_DELTA = Math.abs(PREV_THUMBSTICK_RIGHT_X - THUMBSTICK_RIGHT_X)
-        let RIGHT_Y_DELTA = Math.abs(PREV_THUMBSTICK_RIGHT_Y - THUMBSTICK_RIGHT_Y)
+        if (THUMBSTICK_RIGHT_X_AVG != PREV_THUMBSTICK_RIGHT_X ||
+            THUMBSTICK_RIGHT_Y_AVG != PREV_THUMBSTICK_RIGHT_Y) {
+            control.raiseEvent(THUMBSTICK_RIGHT_MOVED, THUMBSTICK_RIGHT_X_AVG + THUMBSTICK_RIGHT_Y_AVG);
+        }
 
         //remember for next loop
-        PREV_THUMBSTICK_RIGHT_X = THUMBSTICK_RIGHT_X;
-        PREV_THUMBSTICK_RIGHT_Y = THUMBSTICK_RIGHT_Y;
-
-        if (((RIGHT_X_DELTA < 128) && (RIGHT_X_DELTA > 0)) ||
-            ((RIGHT_Y_DELTA < 128) && (RIGHT_Y_DELTA > 0))) {
-
-            // if ((RIGHT_X_DELTA > 0) || (RIGHT_Y_DELTA > 0)) {
-
-            // serial.writeValue("RIGHT_Y_DELTA", RIGHT_Y_DELTA)
-            // serial.writeValue("RIGHT_X_DELTA", RIGHT_X_DELTA)
-            control.raiseEvent(THUMBSTICK_RIGHT_MOVED, THUMBSTICK_RIGHT_X + THUMBSTICK_RIGHT_Y);
-        }
+        PREV_THUMBSTICK_RIGHT_X = THUMBSTICK_RIGHT_X_AVG;
+        PREV_THUMBSTICK_RIGHT_Y = THUMBSTICK_RIGHT_Y_AVG;
     }
 
     /**
@@ -240,7 +266,7 @@ namespace joystick {
     //% blockId=onButtonPressed  block="on button pressed %button"
     //% weight=90
     export function onButtonPressed(
-        button: buttons,
+        button: Buttons,
         handler: () => void
     ) {
         control.onEvent(
@@ -288,10 +314,15 @@ namespace joystick {
         );
     }
 
-    let THUMBSTICK_LEFT_X = 0xff;
-    let THUMBSTICK_LEFT_Y = 0xff;
-    let THUMBSTICK_RIGHT_X = 0xff;
-    let THUMBSTICK_RIGHT_Y = 0xff;
+    let THUMBSTICK_LEFT_X_AVG = 0xff;
+    let THUMBSTICK_LEFT_Y_AVG = 0xff;
+    let THUMBSTICK_RIGHT_X_AVG = 0xff;
+    let THUMBSTICK_RIGHT_Y_AVG = 0xff;
+
+    let THUMBSTICK_LEFT_X_RAW = 0xff;
+    let THUMBSTICK_LEFT_Y_RAW = 0xff;
+    let THUMBSTICK_RIGHT_X_RAW = 0xff;
+    let THUMBSTICK_RIGHT_Y_RAW = 0xff;
 
     let BUTTON_LEFT = 0xff;
     let BUTTON_RIGHT = 0xff;
@@ -413,7 +444,7 @@ namespace joystick {
     //% blockId=isButtonPressed block="Is button %button pressed?"
     //% weight=0
     //% inlineInputMode=inline
-    function isButtonPressed(button: buttons): boolean {
+    function isButtonPressed(button: Buttons): boolean {
         if (getButtonStatus(button) != NONE_PRESS && getButtonStatus(button) != 0xff) {
             return true;
         }
@@ -423,7 +454,7 @@ namespace joystick {
     //% blockId=isButtonReleased block="Is button %button released?"
     //% weight=0
     //% inlineInputMode=inline
-    function isButtonReleased(button: buttons): boolean {
+    function isButtonReleased(button: Buttons): boolean {
         if (getButtonStatus(button) == NONE_PRESS) {
             return true;
         }
@@ -433,7 +464,7 @@ namespace joystick {
     //% blockId=getButtonStatus block="Read %button button status"
     //% weight=45
     //% inlineInputMode=inline
-    export function getButtonStatus(button: buttons): key_status {
+    export function getButtonStatus(button: Buttons): KeyStatus {
         switch (button) {
             case 0:
                 return BUTTON_LEFT;
@@ -472,15 +503,15 @@ namespace joystick {
         let val = 0;
         if (stick == 0) {
             if (axial == 0) {
-                val = THUMBSTICK_LEFT_X;
+                val = THUMBSTICK_LEFT_X_AVG;
             } else {
-                val = THUMBSTICK_LEFT_Y;
+                val = THUMBSTICK_LEFT_Y_AVG;
             }
         } else {
             if (axial == 0) {
-                val = THUMBSTICK_RIGHT_X;
+                val = THUMBSTICK_RIGHT_X_AVG;
             } else {
-                val = THUMBSTICK_RIGHT_Y;
+                val = THUMBSTICK_RIGHT_Y_AVG;
             }
         }
         return val;
@@ -490,38 +521,38 @@ namespace joystick {
     //% blockId=getDirection block="Read compass based direction for %stick thumbstick"
     //% weight=5
     //% inlineInputMode=inline
-    export function getDirection(stick: Stick): direction {
+    export function getDirection(stick: Stick): Direction {
 
         let X = 0;
         let Y = 0;
         let maxValue = 255;
 
         if (stick == Stick.LEFT) {
-            X = Math.trunc(Math.map(THUMBSTICK_LEFT_X, 0, maxValue, 0, 4));
-            Y = Math.trunc(Math.map(THUMBSTICK_LEFT_Y, 0, maxValue, 0, 4));
+            X = Math.trunc(Math.map(THUMBSTICK_LEFT_X_AVG, 0, maxValue, 0, 4));
+            Y = Math.trunc(Math.map(THUMBSTICK_LEFT_Y_AVG, 0, maxValue, 0, 4));
         } else {
-            X = Math.trunc(Math.map(THUMBSTICK_RIGHT_X, 0, maxValue, 0, 4));
-            Y = Math.trunc(Math.map(THUMBSTICK_RIGHT_Y, 0, maxValue, 0, 4));
+            X = Math.trunc(Math.map(THUMBSTICK_RIGHT_X_AVG, 0, maxValue, 0, 4));
+            Y = Math.trunc(Math.map(THUMBSTICK_RIGHT_Y_AVG, 0, maxValue, 0, 4));
         }
 
         if (X == 2 && Y == 4) {
-            return direction.NORTH;
+            return Direction.NORTH;
         } else if (X == 3 && Y == 3) {
-            return direction.NORTH_EAST;
+            return Direction.NORTH_EAST;
         } else if (X == 4 && Y == 2) {
-            return direction.EAST;
+            return Direction.EAST;
         } else if (X == 3 && Y == 1) {
-            return direction.SOUTH_EAST;
+            return Direction.SOUTH_EAST;
         } else if (X == 2 && Y == 0) {
-            return direction.SOUTH;
+            return Direction.SOUTH;
         } else if (X == 1 && Y == 1) {
-            return direction.SOUTH_WEST;
+            return Direction.SOUTH_WEST;
         } else if (X == 0 && Y == 2) {
-            return direction.WEST;
+            return Direction.WEST;
         } else if (X == 1 && Y == 3) {
-            return direction.NORTH_WEST;
+            return Direction.NORTH_WEST;
         } else {
-            return direction.NONE;
+            return Direction.NONE;
         }
     }
 
