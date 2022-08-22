@@ -71,6 +71,24 @@ namespace joystick {
     const centered = 128;
     const timeToSettleMs = 1000;
 
+    const SMOOTHING_WINDOW_SIZE = 1000 / 50;
+    let THUMBSTICK_LEFT_X_AVERAGES: number[] = [];
+    let THUMBSTICK_LEFT_Y_AVERAGES: number[] = [];
+    let THUMBSTICK_RIGHT_X_AVERAGES: number[] = [];
+    let THUMBSTICK_RIGHT_Y_AVERAGES: number[] = [];
+
+    let THUMBSTICK_LEFT_X_AVERAGES_INDEX = 0;
+    let THUMBSTICK_LEFT_Y_AVERAGES_INDEX = 0;
+    let THUMBSTICK_RIGHT_X_AVERAGES_INDEX = 0;
+    let THUMBSTICK_RIGHT_Y_AVERAGES_INDEX = 0;
+
+    for (let i = 0; i < SMOOTHING_WINDOW_SIZE; i++) {
+        THUMBSTICK_LEFT_X_AVERAGES.push(centered);
+        THUMBSTICK_LEFT_Y_AVERAGES.push(centered);
+        THUMBSTICK_RIGHT_X_AVERAGES.push(centered);
+        THUMBSTICK_RIGHT_Y_AVERAGES.push(centered);
+    }
+
     let PREV_THUMBSTICK_LEFT = -1
     let PREV_THUMBSTICK_RIGHT = -1
     let PREV_BUTTON_LEFT = -1
@@ -80,6 +98,8 @@ namespace joystick {
     let PREV_THUMBSTICK_LEFT_Y = centered;
     let PREV_THUMBSTICK_RIGHT_X = centered;
     let PREV_THUMBSTICK_RIGHT_Y = centered;
+
+    export let THUMBSTICK_LEFT_X_AVG = centered;
 
     /**
       * Add into the start function to initialise the joystick.
@@ -96,7 +116,7 @@ namespace joystick {
         }
 
         //set-up I2C fetch loop
-        loops.everyInterval(10, function () {
+        loops.everyInterval(50, function () {
             //led.toggle(0, 0)
             BUTTON_LEFT = i2cread(THUMBSTICK_I2C_ADDR, BUTTON_LEFT_REG);
             BUTTON_RIGHT = i2cread(THUMBSTICK_I2C_ADDR, BUTTON_RIGHT_REG);
@@ -111,6 +131,26 @@ namespace joystick {
             THUMBSTICK_RIGHT_Y = i2cread(THUMBSTICK_I2C_ADDR, THUMBSTICK_RIGHT_Y_REG);
         })
 
+        loops.everyInterval(50, function () {
+
+            THUMBSTICK_LEFT_X_AVERAGES[THUMBSTICK_LEFT_X_AVERAGES_INDEX] = THUMBSTICK_LEFT_X;
+
+            THUMBSTICK_LEFT_X_AVERAGES_INDEX = THUMBSTICK_LEFT_X_AVERAGES_INDEX + 1;
+
+            if (THUMBSTICK_LEFT_X_AVERAGES_INDEX > SMOOTHING_WINDOW_SIZE) {
+                THUMBSTICK_LEFT_X_AVERAGES_INDEX = 0;
+            }
+
+            let avg = 0;
+
+            for (let i = 0; i < SMOOTHING_WINDOW_SIZE; i++) {
+                avg = avg + THUMBSTICK_LEFT_X_AVERAGES[i];
+            }
+
+            THUMBSTICK_LEFT_X_AVG = Math.trunc(avg / SMOOTHING_WINDOW_SIZE);
+
+        })
+
         //set-up event loop
         loops.everyInterval(100, function () {
             //led.toggle(1, 0)
@@ -118,19 +158,23 @@ namespace joystick {
             if (input.runningTime() > timeToSettleMs) {
 
                 //check for button clicks
-                if (PREV_THUMBSTICK_LEFT == 0 && THUMBSTICK_BUTTON_LEFT == 1) {
+                // if (PREV_THUMBSTICK_LEFT == 0 && THUMBSTICK_BUTTON_LEFT == 1) {
+                if (PREV_THUMBSTICK_LEFT != THUMBSTICK_BUTTON_LEFT) {
                     control.raiseEvent(SWITCH_PRESSED + buttons.THUMBSTICK_LEFT, buttons.THUMBSTICK_LEFT + pinOffset)
                 }
 
-                if (PREV_BUTTON_LEFT == 0 && BUTTON_LEFT == 1) {
+                //if (PREV_BUTTON_LEFT == 0 && BUTTON_LEFT == 1) {
+                if (PREV_BUTTON_LEFT != BUTTON_LEFT) {
                     control.raiseEvent(SWITCH_PRESSED + buttons.BUTTON_LEFT, buttons.BUTTON_LEFT + pinOffset)
                 }
 
-                if (PREV_THUMBSTICK_RIGHT == 0 && THUMBSTICK_BUTTON_RIGHT == 1) {
+                //if (PREV_THUMBSTICK_RIGHT == 0 && THUMBSTICK_BUTTON_RIGHT == 1) {
+                if (PREV_THUMBSTICK_RIGHT != THUMBSTICK_BUTTON_RIGHT) {
                     control.raiseEvent(SWITCH_PRESSED + buttons.THUMBSTICK_RIGHT, buttons.THUMBSTICK_RIGHT + pinOffset)
                 }
 
-                if (PREV_BUTTON_RIGHT == 0 && BUTTON_RIGHT == 1) {
+                //  if (PREV_BUTTON_RIGHT == 0 && BUTTON_RIGHT == 1) {
+                if (PREV_BUTTON_RIGHT != BUTTON_RIGHT) {
                     control.raiseEvent(SWITCH_PRESSED + buttons.BUTTON_RIGHT, buttons.BUTTON_RIGHT + pinOffset)
                 }
 
@@ -161,8 +205,8 @@ namespace joystick {
             ((LEFT_Y_DELTA < 128) && (LEFT_Y_DELTA > 0))) {
 
             // if ((LEFT_X_DELTA > 0) || (LEFT_Y_DELTA > 0)) {
-          //  serial.writeValue("LEFT_Y_DELTA", LEFT_Y_DELTA)
-          //  serial.writeValue("LEFT_X_DELTA", LEFT_X_DELTA)
+            //  serial.writeValue("LEFT_Y_DELTA", LEFT_Y_DELTA)
+            //  serial.writeValue("LEFT_X_DELTA", LEFT_X_DELTA)
             control.raiseEvent(THUMBSTICK_LEFT_MOVED, THUMBSTICK_LEFT_X + THUMBSTICK_LEFT_Y);
         }
     }
@@ -182,8 +226,8 @@ namespace joystick {
 
             // if ((RIGHT_X_DELTA > 0) || (RIGHT_Y_DELTA > 0)) {
 
-           // serial.writeValue("RIGHT_Y_DELTA", RIGHT_Y_DELTA)
-           // serial.writeValue("RIGHT_X_DELTA", RIGHT_X_DELTA)
+            // serial.writeValue("RIGHT_Y_DELTA", RIGHT_Y_DELTA)
+            // serial.writeValue("RIGHT_X_DELTA", RIGHT_X_DELTA)
             control.raiseEvent(THUMBSTICK_RIGHT_MOVED, THUMBSTICK_RIGHT_X + THUMBSTICK_RIGHT_Y);
         }
     }
@@ -450,7 +494,7 @@ namespace joystick {
 
         let X = 0;
         let Y = 0;
-let maxValue = 255;
+        let maxValue = 255;
 
         if (stick == Stick.LEFT) {
             X = Math.trunc(Math.map(THUMBSTICK_LEFT_X, 0, maxValue, 0, 4));
