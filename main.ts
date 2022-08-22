@@ -43,7 +43,6 @@ joystick.onRightThumbstickMoved(function () {
 })
 function initRadio(message: string) {
     radio.setTransmitPower(7)
-    radio.setFrequencyBand(76)
     radio.setGroup(76)
     radio.setTransmitSerialNumber(true)
     sendRadioMessage(message)
@@ -57,6 +56,6 @@ let right_x = 0
 let lastCommandSend = 0
 let left_y = 0
 let left_x = 0
-basic.showIcon(IconNames.Heart)
+basic.showIcon(IconNames.StickFigure)
 joystick.start()
 initRadio("START")
