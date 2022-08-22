@@ -308,15 +308,15 @@ namespace joystick {
         );
     }
 
-    let THUMBSTICK_LEFT_X_AVG = 0xff;
-    let THUMBSTICK_LEFT_Y_AVG = 0xff;
-    let THUMBSTICK_RIGHT_X_AVG = 0xff;
-    let THUMBSTICK_RIGHT_Y_AVG = 0xff;
+    let THUMBSTICK_LEFT_X_AVG = centered;
+    let THUMBSTICK_LEFT_Y_AVG = centered;
+    let THUMBSTICK_RIGHT_X_AVG = centered;
+    let THUMBSTICK_RIGHT_Y_AVG = centered;
 
-    let THUMBSTICK_LEFT_X_RAW = 0xff;
-    let THUMBSTICK_LEFT_Y_RAW = 0xff;
-    let THUMBSTICK_RIGHT_X_RAW = 0xff;
-    let THUMBSTICK_RIGHT_Y_RAW = 0xff;
+    let THUMBSTICK_LEFT_X_RAW = centered;
+    let THUMBSTICK_LEFT_Y_RAW = centered;
+    let THUMBSTICK_RIGHT_X_RAW = centered;
+    let THUMBSTICK_RIGHT_Y_RAW = centered;
 
     let BUTTON_LEFT = 0xff;
     let BUTTON_RIGHT = 0xff;
