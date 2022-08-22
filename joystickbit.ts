@@ -147,7 +147,7 @@ namespace joystick {
             ((LEFT_Y_DELTA <= 128) && (LEFT_Y_DELTA > 0))) {
             serial.writeValue("LEFT_Y_DELTA", LEFT_Y_DELTA)
             serial.writeValue("LEFT_X_DELTA", LEFT_X_DELTA)
-            //  control.raiseEvent(THUMBSTICK_LEFT_MOVED, THUMBSTICK_LEFT_X + THUMBSTICK_LEFT_Y);
+            control.raiseEvent(THUMBSTICK_LEFT_MOVED, THUMBSTICK_LEFT_X + THUMBSTICK_LEFT_Y);
         }
     }
 

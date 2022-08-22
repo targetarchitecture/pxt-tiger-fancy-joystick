@@ -25,8 +25,9 @@ input.onButtonPressed(Button.B, function () {
     joystick.setBuzzer(500)
     basic.pause(1000)
     joystick.setBuzzer(0)
-   
+
 })
+
 joystick.onButtonPressed(buttons.BUTTON_RIGHT, function () {
     led.toggle(4, 2)
     sendRadioMessage("BR");
