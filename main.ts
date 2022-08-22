@@ -20,6 +20,7 @@ joystick.onLeftThumbstickMoved(function () {
     sendRadioMessage("LX:" + left_x + ",LY:" + left_y)
     led.toggle(2, 2)
 })
+
 input.onButtonPressed(Button.B, function () {
     sendRadioMessage("BB");
     joystick.setBuzzer(500)
@@ -35,20 +36,23 @@ joystick.onButtonPressed(buttons.BUTTON_RIGHT, function () {
 function sendRadioMessage(message: string) {
     radio.sendString(message)
     lastCommandSend = control.millis()
-    serial.writeString(message)
+    serial.writeLine(message)
 }
+
 joystick.onRightThumbstickMoved(function () {
     right_x = joystick.getThumbstickAxis(Stick.RIGHT, Axis.X_AXIS)
     right_y = joystick.getThumbstickAxis(Stick.RIGHT, Axis.Y_AXIS)
     sendRadioMessage("RX:" + right_x + ",RY:" + right_y)
     led.toggle(2, 2)
 })
+
 function initRadio(message: string) {
     radio.setTransmitPower(7)
     radio.setGroup(76)
     radio.setTransmitSerialNumber(true)
     sendRadioMessage(message)
 }
+
 joystick.onButtonPressed(buttons.THUMBSTICK_RIGHT, function () {
     led.toggle(4, 2)
     sendRadioMessage("TR");
@@ -61,3 +65,8 @@ let left_x = 0
 basic.showIcon(IconNames.StickFigure)
 joystick.start()
 initRadio("START")
+
+loops.everyInterval(1000, function() {
+    
+})
+

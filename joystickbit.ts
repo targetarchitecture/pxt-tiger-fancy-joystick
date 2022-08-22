@@ -95,13 +95,8 @@ namespace joystick {
             alreadyStarted = true;
         }
 
-        // loops.everyInterval(1000, function () {
-
-        //     serial.writeLine(input.runningTime().toString());
-        // })
-
         //set-up I2C fetch loop
-        loops.everyInterval(50, function () {
+        loops.everyInterval(10, function () {
             //led.toggle(0, 0)
             BUTTON_LEFT = i2cread(THUMBSTICK_I2C_ADDR, BUTTON_LEFT_REG);
             BUTTON_RIGHT = i2cread(THUMBSTICK_I2C_ADDR, BUTTON_RIGHT_REG);
@@ -126,22 +121,23 @@ namespace joystick {
                 if (PREV_THUMBSTICK_LEFT == 0 && THUMBSTICK_BUTTON_LEFT == 1) {
                     control.raiseEvent(SWITCH_PRESSED + buttons.THUMBSTICK_LEFT, buttons.THUMBSTICK_LEFT + pinOffset)
                 }
-                PREV_THUMBSTICK_LEFT = THUMBSTICK_BUTTON_LEFT
 
                 if (PREV_BUTTON_LEFT == 0 && BUTTON_LEFT == 1) {
                     control.raiseEvent(SWITCH_PRESSED + buttons.BUTTON_LEFT, buttons.BUTTON_LEFT + pinOffset)
                 }
-                PREV_BUTTON_LEFT = BUTTON_LEFT
 
                 if (PREV_THUMBSTICK_RIGHT == 0 && THUMBSTICK_BUTTON_RIGHT == 1) {
                     control.raiseEvent(SWITCH_PRESSED + buttons.THUMBSTICK_RIGHT, buttons.THUMBSTICK_RIGHT + pinOffset)
-
                 }
-                PREV_THUMBSTICK_RIGHT = THUMBSTICK_BUTTON_RIGHT
 
                 if (PREV_BUTTON_RIGHT == 0 && BUTTON_RIGHT == 1) {
                     control.raiseEvent(SWITCH_PRESSED + buttons.BUTTON_RIGHT, buttons.BUTTON_RIGHT + pinOffset)
                 }
+
+                //set previous button state
+                PREV_THUMBSTICK_LEFT = THUMBSTICK_BUTTON_LEFT
+                PREV_BUTTON_LEFT = BUTTON_LEFT
+                PREV_THUMBSTICK_RIGHT = THUMBSTICK_BUTTON_RIGHT
                 PREV_BUTTON_RIGHT = BUTTON_RIGHT
 
                 //thumbsticks
@@ -161,12 +157,12 @@ namespace joystick {
         PREV_THUMBSTICK_LEFT_X = THUMBSTICK_LEFT_X;
         PREV_THUMBSTICK_LEFT_Y = THUMBSTICK_LEFT_Y;
 
-        // if (((LEFT_X_DELTA < 128) && (LEFT_X_DELTA > 0)) ||
-        //     ((LEFT_Y_DELTA < 128) && (LEFT_Y_DELTA > 0))) {
+        if (((LEFT_X_DELTA < 128) && (LEFT_X_DELTA > 0)) ||
+            ((LEFT_Y_DELTA < 128) && (LEFT_Y_DELTA > 0))) {
 
-        if ((LEFT_X_DELTA > 0) || (LEFT_Y_DELTA > 0)) {
-            serial.writeValue("LEFT_Y_DELTA", LEFT_Y_DELTA)
-            serial.writeValue("LEFT_X_DELTA", LEFT_X_DELTA)
+            // if ((LEFT_X_DELTA > 0) || (LEFT_Y_DELTA > 0)) {
+          //  serial.writeValue("LEFT_Y_DELTA", LEFT_Y_DELTA)
+          //  serial.writeValue("LEFT_X_DELTA", LEFT_X_DELTA)
             control.raiseEvent(THUMBSTICK_LEFT_MOVED, THUMBSTICK_LEFT_X + THUMBSTICK_LEFT_Y);
         }
     }
@@ -181,15 +177,14 @@ namespace joystick {
         PREV_THUMBSTICK_RIGHT_X = THUMBSTICK_RIGHT_X;
         PREV_THUMBSTICK_RIGHT_Y = THUMBSTICK_RIGHT_Y;
 
-        // if (((RIGHT_X_DELTA < 128) && (RIGHT_X_DELTA > 0)) ||
-        //     ((RIGHT_Y_DELTA < 128) && (RIGHT_Y_DELTA > 0))) {
+        if (((RIGHT_X_DELTA < 128) && (RIGHT_X_DELTA > 0)) ||
+            ((RIGHT_Y_DELTA < 128) && (RIGHT_Y_DELTA > 0))) {
 
-        if ((RIGHT_X_DELTA > 0) || (RIGHT_Y_DELTA > 0)) {
+            // if ((RIGHT_X_DELTA > 0) || (RIGHT_Y_DELTA > 0)) {
 
-            serial.writeValue("RIGHT_Y_DELTA", RIGHT_Y_DELTA)
-            serial.writeValue("RIGHT_X_DELTA", RIGHT_X_DELTA)
+           // serial.writeValue("RIGHT_Y_DELTA", RIGHT_Y_DELTA)
+           // serial.writeValue("RIGHT_X_DELTA", RIGHT_X_DELTA)
             control.raiseEvent(THUMBSTICK_RIGHT_MOVED, THUMBSTICK_RIGHT_X + THUMBSTICK_RIGHT_Y);
-
         }
     }
 
@@ -455,12 +450,14 @@ namespace joystick {
 
         let X = 0;
         let Y = 0;
+let maxValue = 255;
+
         if (stick == Stick.LEFT) {
-            X = Math.trunc(Math.map(THUMBSTICK_LEFT_X, 0, 255, 0, 4));
-            Y = Math.trunc(Math.map(THUMBSTICK_LEFT_Y, 0, 255, 0, 4));
+            X = Math.trunc(Math.map(THUMBSTICK_LEFT_X, 0, maxValue, 0, 4));
+            Y = Math.trunc(Math.map(THUMBSTICK_LEFT_Y, 0, maxValue, 0, 4));
         } else {
-            X = Math.trunc(Math.map(THUMBSTICK_RIGHT_X, 0, 255, 0, 4));
-            Y = Math.trunc(Math.map(THUMBSTICK_RIGHT_Y, 0, 255, 0, 4));
+            X = Math.trunc(Math.map(THUMBSTICK_RIGHT_X, 0, maxValue, 0, 4));
+            Y = Math.trunc(Math.map(THUMBSTICK_RIGHT_Y, 0, maxValue, 0, 4));
         }
 
         if (X == 2 && Y == 4) {
