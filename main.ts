@@ -35,6 +35,7 @@ joystick.onButtonPressed(buttons.BUTTON_RIGHT, function () {
 function sendRadioMessage(message: string) {
     radio.sendString(message)
     lastCommandSend = control.millis()
+    serial.writeString(message)
 }
 joystick.onRightThumbstickMoved(function () {
     right_x = joystick.getThumbstickAxis(Stick.RIGHT, Axis.X_AXIS)

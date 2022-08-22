@@ -69,6 +69,7 @@ namespace joystick {
     const THUMBSTICK_RIGHT_MOVED = 7010;
     const pinOffset = 1000;
     const centered = 128;
+    const timeToSettleMs = 1000;
 
     let PREV_THUMBSTICK_LEFT = -1
     let PREV_THUMBSTICK_RIGHT = -1
@@ -94,46 +95,67 @@ namespace joystick {
             alreadyStarted = true;
         }
 
+        loops.everyInterval(1000, function () {
+
+            serial.writeLine(input.runningTime().toString());
+        })
+
         //set-up I2C fetch loop
-        control.inBackground(function () {
-            loops.everyInterval(10, function () {
+        loops.everyInterval(50, function () {
+            //led.toggle(0, 0)
+            BUTTON_LEFT = i2cread(THUMBSTICK_I2C_ADDR, BUTTON_LEFT_REG);
+            BUTTON_RIGHT = i2cread(THUMBSTICK_I2C_ADDR, BUTTON_RIGHT_REG);
 
-                BUTTON_LEFT = i2cread(THUMBSTICK_I2C_ADDR, BUTTON_LEFT_REG);
-                BUTTON_RIGHT = i2cread(THUMBSTICK_I2C_ADDR, BUTTON_RIGHT_REG);
-                THUMBSTICK_BUTTON_LEFT = i2cread(THUMBSTICK_I2C_ADDR, THUMBSTICK_BUTTON_LEFT_REG);
-                THUMBSTICK_BUTTON_RIGHT = i2cread(THUMBSTICK_I2C_ADDR, THUMBSTICK_BUTTON_RIGHT_REG);
+            THUMBSTICK_BUTTON_LEFT = i2cread(THUMBSTICK_I2C_ADDR, THUMBSTICK_BUTTON_LEFT_REG);
+            THUMBSTICK_BUTTON_RIGHT = i2cread(THUMBSTICK_I2C_ADDR, THUMBSTICK_BUTTON_RIGHT_REG);
 
-                //check for button clicks
-                if (PREV_THUMBSTICK_LEFT == 0 && THUMBSTICK_BUTTON_LEFT == 1) {
+            THUMBSTICK_LEFT_X = i2cread(THUMBSTICK_I2C_ADDR, THUMBSTICK_LEFT_X_REG);
+            THUMBSTICK_LEFT_Y = i2cread(THUMBSTICK_I2C_ADDR, THUMBSTICK_LEFT_Y_REG);
+
+            THUMBSTICK_RIGHT_X = i2cread(THUMBSTICK_I2C_ADDR, THUMBSTICK_RIGHT_X_REG);
+            THUMBSTICK_RIGHT_Y = i2cread(THUMBSTICK_I2C_ADDR, THUMBSTICK_RIGHT_Y_REG);
+        })
+
+        //set-up event loop
+        loops.everyInterval(100, function () {
+            //led.toggle(1, 0)
+
+            //check for button clicks
+            if (PREV_THUMBSTICK_LEFT == 0 && THUMBSTICK_BUTTON_LEFT == 1) {
+                if (input.runningTime() > timeToSettleMs) {
                     control.raiseEvent(SWITCH_PRESSED + buttons.THUMBSTICK_LEFT, buttons.THUMBSTICK_LEFT + pinOffset)
                 }
-                PREV_THUMBSTICK_LEFT = THUMBSTICK_BUTTON_LEFT
+            }
+            PREV_THUMBSTICK_LEFT = THUMBSTICK_BUTTON_LEFT
 
-                if (PREV_BUTTON_LEFT == 0 && BUTTON_LEFT == 1) {
+            if (PREV_BUTTON_LEFT == 0 && BUTTON_LEFT == 1) {
+                if (input.runningTime() > timeToSettleMs) {
                     control.raiseEvent(SWITCH_PRESSED + buttons.BUTTON_LEFT, buttons.BUTTON_LEFT + pinOffset)
                 }
-                PREV_BUTTON_LEFT = BUTTON_LEFT
+            }
+            PREV_BUTTON_LEFT = BUTTON_LEFT
 
-                if (PREV_THUMBSTICK_RIGHT == 0 && THUMBSTICK_BUTTON_RIGHT == 1) {
+            if (PREV_THUMBSTICK_RIGHT == 0 && THUMBSTICK_BUTTON_RIGHT == 1) {
+                if (input.runningTime() > timeToSettleMs) {
                     control.raiseEvent(SWITCH_PRESSED + buttons.THUMBSTICK_RIGHT, buttons.THUMBSTICK_RIGHT + pinOffset)
                 }
-                PREV_THUMBSTICK_RIGHT = THUMBSTICK_BUTTON_RIGHT
+            }
+            PREV_THUMBSTICK_RIGHT = THUMBSTICK_BUTTON_RIGHT
 
-                if (PREV_BUTTON_RIGHT == 0 && BUTTON_RIGHT == 1) {
+            if (PREV_BUTTON_RIGHT == 0 && BUTTON_RIGHT == 1) {
+                if (input.runningTime() > timeToSettleMs) {
                     control.raiseEvent(SWITCH_PRESSED + buttons.BUTTON_RIGHT, buttons.BUTTON_RIGHT + pinOffset)
                 }
-                PREV_BUTTON_RIGHT = BUTTON_RIGHT
+            }
+            PREV_BUTTON_RIGHT = BUTTON_RIGHT
 
-                //thumbsticks
-                leftThumbstick();
-                rightThumbstick();
-            })
+            //thumbsticks
+            leftThumbstick();
+            rightThumbstick();
         })
     }
 
     function leftThumbstick() {
-        THUMBSTICK_LEFT_X = i2cread(THUMBSTICK_I2C_ADDR, THUMBSTICK_LEFT_X_REG);
-        THUMBSTICK_LEFT_Y = i2cread(THUMBSTICK_I2C_ADDR, THUMBSTICK_LEFT_Y_REG);
 
         //delta
         let LEFT_X_DELTA = Math.abs(PREV_THUMBSTICK_LEFT_X - THUMBSTICK_LEFT_X)
@@ -143,17 +165,18 @@ namespace joystick {
         PREV_THUMBSTICK_LEFT_X = THUMBSTICK_LEFT_X;
         PREV_THUMBSTICK_LEFT_Y = THUMBSTICK_LEFT_Y;
 
-        if (((LEFT_X_DELTA <= 128) && (LEFT_X_DELTA > 0)) ||
-            ((LEFT_Y_DELTA <= 128) && (LEFT_Y_DELTA > 0))) {
-            serial.writeValue("LEFT_Y_DELTA", LEFT_Y_DELTA)
-            serial.writeValue("LEFT_X_DELTA", LEFT_X_DELTA)
-            control.raiseEvent(THUMBSTICK_LEFT_MOVED, THUMBSTICK_LEFT_X + THUMBSTICK_LEFT_Y);
+        if (((LEFT_X_DELTA < 128) && (LEFT_X_DELTA > 0)) ||
+            ((LEFT_Y_DELTA < 128) && (LEFT_Y_DELTA > 0))) {
+
+            if (input.runningTime() > timeToSettleMs) {
+                serial.writeValue("LEFT_Y_DELTA", LEFT_Y_DELTA)
+                serial.writeValue("LEFT_X_DELTA", LEFT_X_DELTA)
+                control.raiseEvent(THUMBSTICK_LEFT_MOVED, THUMBSTICK_LEFT_X + THUMBSTICK_LEFT_Y);
+            }
         }
     }
 
     function rightThumbstick() {
-        THUMBSTICK_RIGHT_X = i2cread(THUMBSTICK_I2C_ADDR, THUMBSTICK_RIGHT_X_REG);
-        THUMBSTICK_RIGHT_Y = i2cread(THUMBSTICK_I2C_ADDR, THUMBSTICK_RIGHT_Y_REG);
 
         //delta
         let RIGHT_X_DELTA = Math.abs(PREV_THUMBSTICK_RIGHT_X - THUMBSTICK_RIGHT_X)
@@ -163,11 +186,14 @@ namespace joystick {
         PREV_THUMBSTICK_RIGHT_X = THUMBSTICK_RIGHT_X;
         PREV_THUMBSTICK_RIGHT_Y = THUMBSTICK_RIGHT_Y;
 
-        if (((RIGHT_X_DELTA <= 128) && (RIGHT_X_DELTA > 0)) ||
-            ((RIGHT_Y_DELTA <= 128) && (RIGHT_Y_DELTA > 0))) {
-            serial.writeValue("RIGHT_Y_DELTA", RIGHT_Y_DELTA)
-            serial.writeValue("RIGHT_X_DELTA", RIGHT_X_DELTA)
-            control.raiseEvent(THUMBSTICK_RIGHT_MOVED, THUMBSTICK_RIGHT_X + THUMBSTICK_RIGHT_Y);
+        if (((RIGHT_X_DELTA < 128) && (RIGHT_X_DELTA > 0)) ||
+            ((RIGHT_Y_DELTA < 128) && (RIGHT_Y_DELTA > 0))) {
+
+            if (input.runningTime() > timeToSettleMs) {
+                serial.writeValue("RIGHT_Y_DELTA", RIGHT_Y_DELTA)
+                serial.writeValue("RIGHT_X_DELTA", RIGHT_X_DELTA)
+                control.raiseEvent(THUMBSTICK_RIGHT_MOVED, THUMBSTICK_RIGHT_X + THUMBSTICK_RIGHT_Y);
+            }
         }
     }
 
