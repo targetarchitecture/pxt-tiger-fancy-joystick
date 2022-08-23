@@ -117,7 +117,11 @@ namespace joystick {
 
         //set-up I2C fetch loop
         loops.everyInterval(timeToRepeatMs, function () {
-            //led.toggle(0, 0)
+
+        //     control.inBackground(function () {
+        //         led.toggle(2, 4)
+        //   })
+
             BUTTON_LEFT = i2cread(THUMBSTICK_I2C_ADDR, BUTTON_LEFT_REG);
             BUTTON_RIGHT = i2cread(THUMBSTICK_I2C_ADDR, BUTTON_RIGHT_REG);
 
@@ -131,6 +135,10 @@ namespace joystick {
         })
 
         loops.everyInterval(timeToRepeatMs, function () {
+
+        //     control.inBackground(function () {
+        //         led.toggle(1, 4)
+        //    })
 
             THUMBSTICK_LEFT_X_AVERAGES[THUMBSTICK_LEFT_X_AVERAGES_INDEX] = THUMBSTICK_LEFT_X_RAW;
             THUMBSTICK_LEFT_Y_AVERAGES[THUMBSTICK_LEFT_Y_AVERAGES_INDEX] = THUMBSTICK_LEFT_Y_RAW;
@@ -195,6 +203,10 @@ namespace joystick {
         //set-up event loop
         loops.everyInterval(timeToRepeatMs, function () {
             //led.toggle(1, 0)
+
+            // control.inBackground(function () {
+            //     led.toggle(4, 4)
+            // })
 
             if (input.runningTime() > timeToSettleMs) {
 
