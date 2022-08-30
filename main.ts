@@ -27,9 +27,11 @@ input.onButtonPressed(Button.B, function () {
 })
 
 function sendRadioMessage(message: string) {
-    radio.sendString(message)
-    lastCommandSend = control.millis()
+    if (radioConnected == true) {
+        radio.sendString(message);
+    }
 }
+
 input.onGesture(Gesture.TiltRight, function () {
     sendRadioMessage("TILTRIGHT")
 })
@@ -37,32 +39,34 @@ joystick.onButtonPressed(Buttons.BUTTON_LEFT, function () {
     sendRadioMessage("BUTTON_LEFT")
 })
 
+let radioConnected = false;
+
 function initRadio(message: string) {
     radio.setTransmitPower(7)
     radio.setGroup(76)
     radio.setTransmitSerialNumber(true)
+
+    radioConnected = true;
+
     sendRadioMessage(message)
+
+    // always transmit joystick positions
+    loops.everyInterval(100, function () {
+        const left_x = joystick.getThumbstickAxis(Stick.LEFT, Axis.X_AXIS)
+        const left_y = joystick.getThumbstickAxis(Stick.LEFT, Axis.Y_AXIS)
+        const right_x = joystick.getThumbstickAxis(Stick.RIGHT, Axis.X_AXIS)
+        const right_y = joystick.getThumbstickAxis(Stick.RIGHT, Axis.Y_AXIS)
+        sendRadioMessage("RX:" + right_x + ",RY:" + right_y)
+        sendRadioMessage("LX:" + left_x + ",LY:" + left_y)
+
+        led.toggle(2, 3);
+    })
 }
 
-let lastCommandSend = control.millis()
+//let lastCommandSend = control.millis()
 basic.showIcon(IconNames.StickFigure)
 joystick.start()
 initRadio("START")
-
-// always transmit joystick positions
-loops.everyInterval(100, function () {
-    const left_x = joystick.getThumbstickAxis(Stick.LEFT, Axis.X_AXIS)
-    const left_y = joystick.getThumbstickAxis(Stick.LEFT, Axis.Y_AXIS)
-    const right_x = joystick.getThumbstickAxis(Stick.RIGHT, Axis.X_AXIS)
-    const right_y = joystick.getThumbstickAxis(Stick.RIGHT, Axis.Y_AXIS)
-    sendRadioMessage("RX:" + right_x + ",RY:" + right_y)
-    sendRadioMessage("LX:" + left_x + ",LY:" + left_y)
-    control.inBackground(function () {
-        led.toggle(2, 3)
-    })
-})
-
-
 
 //deal with incoming messages
 radio.onReceivedString(function (receivedString: string) {
