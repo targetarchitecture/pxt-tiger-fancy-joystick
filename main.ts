@@ -1,7 +1,7 @@
 
 function sendRadioMessage_Buttons(value: Buttons) {
     if (radioConnected == true) {
-        radio.sendValue("BUTTON", KeyStatus.SINGLE_CLICK);
+        radio.sendValue("PRESSED", value);
     }
 }
 
@@ -62,7 +62,6 @@ function initRadio() {
     radioConnected = true;
 
     radio.sendValue("START", 1);
-
 
     // always transmit joystick positions
     loops.everyInterval(100, function () {
