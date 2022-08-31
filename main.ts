@@ -1,54 +1,68 @@
-joystick.onButtonPressed(Buttons.THUMBSTICK_RIGHT, function () {
-    sendRadioMessage("THUMBSTICK_RIGHT")
-})
 
-joystick.onButtonPressed(Buttons.THUMBSTICK_LEFT, function () {
-    sendRadioMessage("THUMBSTICK_LEFT")
-})
-
-input.onButtonPressed(Button.A, function () {
-    sendRadioMessage("BUTTON_A")
-})
-
-joystick.onButtonPressed(Buttons.BUTTON_RIGHT, function () {
-    sendRadioMessage("BUTTON_RIGHT")
-})
-
-input.onGesture(Gesture.TiltLeft, function () {
-    sendRadioMessage("TILTLEFT")
-})
-
-input.onButtonPressed(Button.AB, function () {
-    sendRadioMessage("BUTTON_AB")
-})
-
-input.onButtonPressed(Button.B, function () {
-    sendRadioMessage("BUTTON_B")
-})
-
-function sendRadioMessage(message: string) {
+function sendRadioMessage_Buttons(value: Buttons) {
     if (radioConnected == true) {
-        radio.sendString(message);
+        radio.sendValue("BUTTON", KeyStatus.SINGLE_CLICK);
     }
 }
 
-input.onGesture(Gesture.TiltRight, function () {
-    sendRadioMessage("TILTRIGHT")
+function sendRadioMessage_Gesture(value: Gesture) {
+    if (radioConnected == true) {
+        radio.sendValue("GESTURE", value);
+    }
+}
+
+function sendRadioMessage_Joystick(axis: string, value: Gesture) {
+    if (radioConnected == true) {
+        radio.sendValue(axis, value);
+    }
+}
+
+joystick.onButtonPressed(Buttons.THUMBSTICK_RIGHT, function () {
+    sendRadioMessage_Buttons(Buttons.THUMBSTICK_RIGHT);
 })
+
+joystick.onButtonPressed(Buttons.THUMBSTICK_LEFT, function () {
+    sendRadioMessage_Buttons(Buttons.THUMBSTICK_LEFT);
+})
+
+input.onButtonPressed(Button.A, function () {
+    sendRadioMessage_Buttons(Buttons.BUTTON_A);
+})
+
+joystick.onButtonPressed(Buttons.BUTTON_RIGHT, function () {
+    sendRadioMessage_Buttons(Buttons.BUTTON_RIGHT);
+})
+
+input.onButtonPressed(Button.AB, function () {
+    sendRadioMessage_Buttons(Buttons.BUTTON_AB);
+})
+
+input.onButtonPressed(Button.B, function () {
+    sendRadioMessage_Buttons(Buttons.BUTTON_B);
+})
+
 joystick.onButtonPressed(Buttons.BUTTON_LEFT, function () {
-    sendRadioMessage("BUTTON_LEFT")
+    sendRadioMessage_Buttons(Buttons.BUTTON_LEFT);
+})
+
+input.onGesture(Gesture.TiltLeft, function () {
+    sendRadioMessage_Gesture(Gesture.TiltLeft);
+})
+input.onGesture(Gesture.TiltRight, function () {
+    sendRadioMessage_Gesture(Gesture.TiltRight);
 })
 
 let radioConnected = false;
 
-function initRadio(message: string) {
+function initRadio() {
     radio.setTransmitPower(7)
     radio.setGroup(76)
     radio.setTransmitSerialNumber(true)
 
     radioConnected = true;
 
-    sendRadioMessage(message)
+    radio.sendValue("START", 1);
+
 
     // always transmit joystick positions
     loops.everyInterval(100, function () {
@@ -56,8 +70,11 @@ function initRadio(message: string) {
         const left_y = joystick.getThumbstickAxis(Stick.LEFT, Axis.Y_AXIS)
         const right_x = joystick.getThumbstickAxis(Stick.RIGHT, Axis.X_AXIS)
         const right_y = joystick.getThumbstickAxis(Stick.RIGHT, Axis.Y_AXIS)
-        sendRadioMessage("RX:" + right_x + ",RY:" + right_y)
-        sendRadioMessage("LX:" + left_x + ",LY:" + left_y)
+
+        sendRadioMessage_Joystick("RX", right_x);
+        sendRadioMessage_Joystick("RY", right_y);
+        sendRadioMessage_Joystick("LX", left_x);
+        sendRadioMessage_Joystick("LY", left_y);
 
         led.toggle(2, 3);
     })
@@ -66,15 +83,14 @@ function initRadio(message: string) {
 //let lastCommandSend = control.millis()
 basic.showIcon(IconNames.StickFigure)
 joystick.start()
-initRadio("START")
+initRadio()
 
 //deal with incoming messages
-radio.onReceivedString(function (receivedString: string) {
-
-    if (receivedString == "BUZZER") {
-        buzzer();
-    } else if (receivedString == "VIBRATE") {
-        vibrate();
+radio.onReceivedValue(function (name: string, value: number) {
+    if (name == "BUZZER") {
+        buzzer(value);
+    } else if (name == "VIBRATE") {
+        vibrate(value);
     }
 })
 
