@@ -33,7 +33,7 @@ input.onGesture(Gesture.TiltRight, function () {
     sendRadioMessage_Gesture(Gesture.TiltRight);
 })
 
-// deal with incoming messages
+//deal with incoming messages
 radio.onReceivedValue(function (name, value) {
     if (name == "BUZZER") {
         buzzer(value);
@@ -49,6 +49,7 @@ function initRadio () {
     radio.setTransmitSerialNumber(true)
     radioConnected = true
     radio.sendValue("START", 1)
+    basic.pause(1)
 
     loops.everyInterval(100, function () {
         const left_x = joystick.getThumbstickAxis(Stick.LEFT, Axis.X_AXIS)

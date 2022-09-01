@@ -75,8 +75,9 @@ namespace joystick {
     const THUMBSTICK_RIGHT_MOVED = 7010;
     const pinOffset = 1000;
     export const centered = 128;
-    const timeToRepeatMs = 50;
-    const timeToSettleMs = 100;
+    
+    const timeToRepeatMs = 100;
+    const timeToSettleMs = 50;
 
     const SMOOTHING_WINDOW_SIZE = 1000 / timeToRepeatMs;
     let THUMBSTICK_LEFT_X_AVERAGES: number[] = [];
@@ -106,7 +107,6 @@ namespace joystick {
     let PREV_THUMBSTICK_RIGHT_X = centered;
     let PREV_THUMBSTICK_RIGHT_Y = centered;
 
-
     /**
       * Add into the start function to initialise the joystick.
     */
@@ -124,10 +124,6 @@ namespace joystick {
         //set-up I2C fetch loop
         loops.everyInterval(timeToRepeatMs, function () {
 
-        //     control.inBackground(function () {
-        //         led.toggle(2, 4)
-        //   })
-
             BUTTON_LEFT = i2cread(THUMBSTICK_I2C_ADDR, BUTTON_LEFT_REG);
             BUTTON_RIGHT = i2cread(THUMBSTICK_I2C_ADDR, BUTTON_RIGHT_REG);
 
@@ -141,10 +137,6 @@ namespace joystick {
         })
 
         loops.everyInterval(timeToRepeatMs, function () {
-
-        //     control.inBackground(function () {
-        //         led.toggle(1, 4)
-        //    })
 
             THUMBSTICK_LEFT_X_AVERAGES[THUMBSTICK_LEFT_X_AVERAGES_INDEX] = THUMBSTICK_LEFT_X_RAW;
             THUMBSTICK_LEFT_Y_AVERAGES[THUMBSTICK_LEFT_Y_AVERAGES_INDEX] = THUMBSTICK_LEFT_Y_RAW;
@@ -162,7 +154,6 @@ namespace joystick {
             if (THUMBSTICK_LEFT_Y_AVERAGES_INDEX > SMOOTHING_WINDOW_SIZE) {
                 THUMBSTICK_LEFT_Y_AVERAGES_INDEX = 0;
             }
-
             if (THUMBSTICK_RIGHT_X_AVERAGES_INDEX > SMOOTHING_WINDOW_SIZE) {
                 THUMBSTICK_RIGHT_X_AVERAGES_INDEX = 0;
             }
@@ -208,11 +199,6 @@ namespace joystick {
 
         //set-up event loop
         loops.everyInterval(timeToRepeatMs, function () {
-            //led.toggle(1, 0)
-
-            // control.inBackground(function () {
-            //     led.toggle(4, 4)
-            // })
 
             if (input.runningTime() > timeToSettleMs) {
 
@@ -437,21 +423,6 @@ namespace joystick {
     let THUMBSTICK_BUTTON_LEFT_REG = 0x20;
 
     let NONE_PRESS = 8;
-
-    // function Get_Button_Status(button: number) {
-    //     switch (button) {
-    //         case 0:
-    //             return BUTTON_LEFT;
-    //         case 1:
-    //             return BUTTON_RIGHT;
-    //         case 2:
-    //             return THUMBSTICK_BUTTON_LEFT;
-    //         case 3:
-    //             return THUMBSTICK_BUTTON_RIGHT;
-    //         default:
-    //             return 0xff;
-    //     }
-    // }
 
     //% blockId=isButtonPressed block="Is button %button pressed?"
     //% weight=0
