@@ -65,6 +65,7 @@ function initRadio () {
     })
 }
 let radioConnected = false
+
 function sendRadioMessage_Buttons(value: Buttons) {
     if (radioConnected == true) {
         radio.sendValue("PRESSED", value);
