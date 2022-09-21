@@ -60,9 +60,9 @@ enum Axis {
 
 enum Stick {
     //% block="LEFT"
-    LEFT = 0,
+    LEFT = 1,
     //% block="RIGHT"
-    RIGHT = 1,
+    RIGHT = 0,
 }
 
 //% color="#FF6EC7" weight=10 icon="\uf11b" block="Tiger Fancy Joystick"
@@ -412,8 +412,16 @@ namespace joystick {
 
     let THUMBSTICK_I2C_ADDR = 0x5A;
 
+
+    let JOYSTICK_LEFT_X_REG = 0x10;
+    let JOYSTICK_LEFT_Y_REG = 0x11;
+    let JOYSTICK_RIGHT_X_REG = 0x12;
+    let JOYSTICK_RIGHT_Y_REG = 0x13;
+
+
     let THUMBSTICK_LEFT_X_REG = 0x10;
     let THUMBSTICK_LEFT_Y_REG = 0x11;
+    
     let THUMBSTICK_RIGHT_X_REG = 0x12;
     let THUMBSTICK_RIGHT_Y_REG = 0x13;
 
